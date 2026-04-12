@@ -7,9 +7,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 50MB
   datasource:
-    url: ${DB_URL:jdbc:mariadb://localhost:3306/laptify_db}
+    url: ${DB_URL:jdbc:mariadb://localhost:3307/laptify_db}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    password: ${DB_PASSWORD:18112005@Duc}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     properties:
@@ -17,7 +17,7 @@ spring:
         dialect: org.hibernate.dialect.MariaDBDialect
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
 security:
   jwt:

@@ -15,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Product {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
@@ -40,4 +41,16 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Sku> skus = new ArrayList<>();
+
+    public Product(String name, String description, Category category, Brand brand) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.brand = brand;
+    }
+
+    public void addSku(Sku sku) {
+        skus.add(sku);
+        sku.setProduct(this);
+    }
 }

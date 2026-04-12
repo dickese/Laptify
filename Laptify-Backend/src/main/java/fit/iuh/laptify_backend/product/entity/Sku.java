@@ -31,4 +31,12 @@ public class Sku {
     @JoinColumn(name = "product_id", nullable = false)
     @ToString.Exclude
     private Product product;
+
+    public Sku(String skuCode, String color, BigDecimal price, Integer stockQuantity, Product product) {
+        this.skuCode = skuCode;
+        this.color = color;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.product = product;
+    }
 }
