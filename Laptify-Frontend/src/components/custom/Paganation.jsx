@@ -55,13 +55,12 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
           key={idx}
           onClick={() => typeof page === 'number' && onPageChange(page)}
           disabled={page === '...'}
-          className={`px-3 py-2 rounded-md transition ${
-            page === currentPage
-              ? 'bg-red-600 text-white font-semibold'
-              : page === '...'
-                ? 'cursor-default'
-                : 'border border-gray-300 hover:bg-gray-100'
-          }`}
+          className={`px-3 py-2 rounded-md transition ${page === currentPage
+            ? 'bg-red-600 text-white font-semibold'
+            : page === '...'
+              ? 'cursor-default'
+              : 'border border-gray-300 hover:bg-gray-100'
+            }`}
         >
           {page}
         </button>
