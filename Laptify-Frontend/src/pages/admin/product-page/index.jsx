@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Pagination from '@/components/custom/Paganation.jsx';
 import ProductTable from '@/pages/admin/product-page/ProductTable.jsx';
@@ -7,6 +8,7 @@ import { mockProducts, categories, manufacturers } from '@/data/mockProducts.js'
 
 
 const ProductManagementPage = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState(mockProducts);
   const [filteredProducts, setFilteredProducts] = useState(mockProducts);
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,7 +97,7 @@ const ProductManagementPage = () => {
   };
 
   const handleEdit = (id) => {
-    alert(`Chỉnh sửa sản phẩm ID: ${id}`);
+    navigate(`/admin/product-updating/${id}`);
   };
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -117,7 +119,10 @@ const ProductManagementPage = () => {
         <h2 className='text-xl font-semibold text-gray-800'>
           Danh sách sản phẩm
         </h2>
-        <button className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition font-medium'>
+        <button
+          onClick={() => navigate('/admin/product-addition')}
+          className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition font-medium'
+        >
           Thêm sản phẩm
         </button>
       </div>

@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { ChevronDown, Home, Box, ShoppingCart } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils.js';
 
 export default function SideBar() {
   const [expandedMenu, setExpandedMenu] = useState(null);
+  const location = useLocation()
 
   const menuItems = [
     {
@@ -15,7 +18,10 @@ export default function SideBar() {
       id: 'products',
       label: 'Quản lý sản phẩm',
       icon: Box,
-      subItems: [{ label: 'Danh sách sản phẩm' }, { label: 'Thêm sản phẩm' }],
+      subItems: [
+        { label: 'Danh sách sản phẩm', path: '/admin/products' },
+        { label: 'Thêm sản phẩm', path: '/admin/product-addition' },
+      ],
     },
     {
       id: 'orders',
@@ -56,14 +62,15 @@ export default function SideBar() {
               </button>
 
               {hasSubItems && isExpanded && (
-                <div className='ml-8 space-y-1 mt-1'>
+                <div className='flex flex-col ml-10'>
                   {item.subItems.map((subItem, idx) => (
-                    <button
+                    <Link
+                      to={`${subItem.path}`}
                       key={idx}
-                      className='w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition text-sm'
+                      className={cn(`w-full text-left px-4 py-2  rounded-md transition text-sm ${location.pathname === subItem.path ? 'bg-white text-black hover:bg-white':'text-gray-300 hover:text-white hover:bg-gray-800 '}`)}
                     >
                       {subItem.label}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               )}
