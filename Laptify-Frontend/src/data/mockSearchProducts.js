@@ -146,19 +146,19 @@ export const mockSearchProducts = [
 ];
 
 export const searchCategories = [
-  { value: 'laptop', label: 'Laptop' },
-  { value: 'tai-nghe', label: 'Tai nghe' },
-  { value: 'chuot', label: 'Chuột' },
-  { value: 'ban-phim', label: 'Bàn phím' },
-  { value: 'tay-cam', label: 'Tay cầm console' },
+  { id: '1', value: 'laptop', label: 'Laptop' },
+  { id: '2', value: 'ban-phim', label: 'Bàn phím' },
+  { id: '3', value: 'chuot', label: 'Chuột' },
+  { id: '4', value: 'tai-nghe', label: 'Tai nghe' },
+  { id: '5', value: 'tay-cam', label: 'Tay cầm console' },
 ];
 
 export const searchBrands = [
-  { value: 'apple', label: 'Apple' },
-  { value: 'asus', label: 'Asus' },
-  { value: 'msi', label: 'MSI' },
-  { value: 'lenovo', label: 'Lenovo' },
-  { value: 'acer', label: 'Acer' },
+  { id: 'APPLE', value: 'apple', label: 'Apple' },
+  { id: 'ASUS', value: 'asus', label: 'Asus' },
+  { id: 'MSI', value: 'msi', label: 'MSI' },
+  { id: 'LENOVO', value: 'lenovo', label: 'Lenovo' },
+  { id: 'ACER', value: 'acer', label: 'Acer' },
 ];
 
 export const sortOptions = [

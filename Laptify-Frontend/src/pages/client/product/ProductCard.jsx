@@ -38,12 +38,11 @@ const ProductCard = ({ product }) => {
 
         {/* Price */}
         <div className='mb-2'>
-          <p className='text-red-600 font-bold text-sm'>{formatPrice(product.price)}</p>
-          <p className='text-gray-500 text-xs line-through'>{formatPrice(product.originalPrice)}</p>
+          <p className='text-red-600 font-bold text-2xl'>{formatPrice(product.price)}</p>
         </div>
 
         {/* Purchase Count */}
-        <p className='text-gray-600 text-xs'>{product.purchaseCount} lượt mua</p>
+        <p className='text-gray-600 text-xs'>{product.totalPurchases} lượt mua</p>
       </div>
     </div>
   );

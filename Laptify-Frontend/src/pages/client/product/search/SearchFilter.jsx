@@ -3,23 +3,23 @@ import { searchCategories, searchBrands } from '@/data/mockSearchProducts';
 import { Separator } from '@/components/ui/separator';
 
 const SearchFilter = ({ onFilterChange }) => {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState({});
+  const [selectedBrand, setSelectedBrand] = useState({});
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
 
   const handleApplyFilter = () => {
     onFilterChange({
-      category: selectedCategory,
-      brand: selectedBrand,
+      category: selectedCategory.id,
+      brand: selectedBrand.id,
       priceFrom: priceFrom ? parseInt(priceFrom) : null,
       priceTo: priceTo ? parseInt(priceTo) : null,
     });
   };
 
   const handleClearFilter = () => {
-    setSelectedCategory('');
-    setSelectedBrand('');
+    setSelectedCategory({});
+    setSelectedBrand({});
     setPriceFrom('');
     setPriceTo('');
     onFilterChange({
@@ -42,8 +42,8 @@ const SearchFilter = ({ onFilterChange }) => {
             <label key={cat.value} className='flex items-center cursor-pointer hover:text-red-600 transition'>
               <input
                 type='checkbox'
-                checked={selectedCategory === cat.value}
-                onChange={(e) => setSelectedCategory(e.target.checked ? cat.value : '')}
+                checked={selectedCategory.id === cat.id}
+                onChange={(e) => setSelectedCategory(e.target.checked ? cat : {})}
                 className='w-4 h-4 rounded border-gray-300 cursor-pointer'
               />
               <span className='ml-2 text-sm text-gray-700'>{cat.label}</span>
@@ -60,8 +60,8 @@ const SearchFilter = ({ onFilterChange }) => {
             <label key={brand.value} className='flex items-center cursor-pointer hover:text-red-600 transition'>
               <input
                 type='checkbox'
-                checked={selectedBrand === brand.value}
-                onChange={(e) => setSelectedBrand(e.target.checked ? brand.value : '')}
+                checked={selectedBrand.id === brand.id}
+                onChange={(e) => setSelectedBrand(e.target.checked ? brand : {})}
                 className='w-4 h-4 rounded border-gray-300 cursor-pointer'
               />
               <span className='ml-2 text-sm text-gray-700'>{brand.label}</span>
