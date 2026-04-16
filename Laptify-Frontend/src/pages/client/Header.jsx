@@ -1,58 +1,96 @@
-import React from 'react';
-import { Search, Heart, ShoppingCart, User, ChevronDown } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Heart, ShoppingCart } from "lucide-react";
 
 const Header = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      navigate(`/products/search?keyword=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const navItems = [
+    { label: "Trang chủ", path: "/" },
+    { label: "Liên hệ", path: "/contact" },
+    { label: "Về chúng tôi", path: "/about" },
+    { label: "Đăng ký", path: "/register" },
+  ];
+
   return (
-    <div className='flex flex-col'>
-      {/* Promo Banner */}
-      <div className='bg-gray-900 text-white py-3 px-4 text-center text-sm'>
-        Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!{' '}
-        <span className='font-semibold cursor-pointer hover:underline'>ShopNow</span>
+    <header className="w-full">
+      {/* Announcement Bar */}
+      <div className="bg-black py-2 text-center text-sm text-white">
+        <p>
+          Ưu đãi hè: Giảm 50% tất cả đơi bơi & Miễn phí giao hàng hỏi tốc!{" "}
+          <Link
+            to="/shop"
+            className="ml-1 font-semibold underline underline-offset-2 hover:opacity-80"
+          >
+            Mua ngay
+          </Link>
+        </p>
       </div>
 
-      {/* Main Navigation */}
-      <nav className='bg-white border-b border-gray-200'>
-        <div className='max-w-7xl mx-auto px-4 py-4'>
-          <div className='flex items-center justify-between mb-4'>
-            {/* Brand Logo */}
-            <h1 className='text-2xl font-bold tracking-wide'>Exclusive</h1>
+      {/* Main Header */}
+      <div className="border-b border-border bg-background">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+          {/* Logo */}
+          <Link to="/" className="text-xl font-bold text-foreground">
+            Laptify
+          </Link>
 
+          {/* Navigation */}
+          <nav className="hidden items-center gap-8 md:flex">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Search and Icons */}
+          <div className="flex items-center gap-4">
             {/* Search Bar */}
-            <div className='flex-1 mx-8'>
-              <div className='flex items-center bg-gray-100 rounded-full px-4 py-2'>
-                <input
-                  type='text'
-                  placeholder='What are you looking for?'
-                  className='flex-1 bg-gray-100 outline-none text-sm'
-                />
-                <Search size={18} className='text-gray-600' />
-              </div>
+            <div className="relative hidden sm:block">
+              <input
+                type="text"
+                placeholder="Bạn đang tìm kiếm sản phẩm gì?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                className="h-10 w-64 rounded-md border border-input bg-background px-4 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring lg:w-80"
+              />
+              <Search className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             </div>
 
-            {/* Right Icons */}
-            <div className='flex items-center gap-6'>
-              <Heart size={20} className='cursor-pointer hover:fill-red-500 hover:text-red-500 transition' />
-              <ShoppingCart size={20} className='cursor-pointer hover:text-red-500 transition' />
-              <User size={20} className='cursor-pointer hover:text-red-500 transition' />
-            </div>
-          </div>
+            {/* Wishlist Icon */}
+            <Link
+              to="/wishlist"
+              className="flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
+              aria-label="Yêu thích"
+            >
+              <Heart className="size-5" />
+            </Link>
 
-          {/* Menu Links */}
-          <div className='flex items-center gap-8'>
-            <a href='/' className='text-gray-700 hover:text-red-600 font-medium transition'>Home</a>
-            <a href='#' className='text-gray-700 hover:text-red-600 font-medium transition'>Contact</a>
-            <a href='#' className='text-gray-700 hover:text-red-600 font-medium transition'>About</a>
-            <a href='#' className='text-gray-700 hover:text-red-600 font-medium transition'>Sign Up</a>
-
-            {/* Language Selector */}
-            <div className='ml-auto flex items-center gap-1 cursor-pointer text-gray-700 hover:text-red-600 transition'>
-              <span className='text-sm'>English</span>
-              <ChevronDown size={16} />
-            </div>
+            {/* Cart Icon */}
+            <Link
+              to="/cart"
+              className="flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
+              aria-label="Giỏ hàng"
+            >
+              <ShoppingCart className="size-5" />
+            </Link>
           </div>
         </div>
-      </nav>
-    </div>
+      </div>
+    </header>
   );
 };
 

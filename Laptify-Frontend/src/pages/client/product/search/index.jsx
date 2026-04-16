@@ -8,7 +8,7 @@ const SearchPage = () => {
   const productType = location.pathname;
 
   const queryParams = new URLSearchParams(location.search);
-  const searchQuery = queryParams.get('keyword');
+  const searchQuery = queryParams.get('keyword')
 
   const endpoint = productType ? `http://localhost:8080/api/v1${productType}` : 'http://localhost:8080/api/v1/products/news';
 
@@ -103,7 +103,7 @@ const SearchPage = () => {
           <div className='lg:col-span-3'>
             <ProductList
               products={sortedProducts}
-              title={"a"}
+              title={`Kết quả tìm kiếm cho "${searchQuery}"`}
               currentPage={currentPage}
               totalPages={productResponse.totalPages}
               sortBy={sortBy}
