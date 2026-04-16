@@ -2,7 +2,11 @@ package fit.iuh.laptify_backend.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "skus")
@@ -27,8 +31,9 @@ public class Sku {
     @Column(name = "total_purchases", nullable = false)
     private Integer totalPurchases = 0;
 
-    @Column(name = "image_url", length = 500)
-    private String imageUrl;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "json")
+    private List<MediaMetadata> mediaMetadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)

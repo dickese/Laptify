@@ -1,5 +1,6 @@
 package fit.iuh.laptify_backend.product.dto.response;
 
+import fit.iuh.laptify_backend.product.entity.MediaMetadata;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,5 +15,5 @@ public class ProductResponse {
     private String name;
     private BigDecimal price;
     private Integer totalPurchases;
-    private String imageUrl;
+    private MediaMetadata mediaMetadata;
 }

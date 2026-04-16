@@ -7,10 +7,7 @@ import fit.iuh.laptify_backend.product.dto.request.ProductFilter;
 import fit.iuh.laptify_backend.product.dto.response.ProductDetailResponse;
 import fit.iuh.laptify_backend.product.dto.response.ProductResponse;
 import fit.iuh.laptify_backend.product.dto.response.ProductSkuResponse;
-import fit.iuh.laptify_backend.product.entity.Brand;
-import fit.iuh.laptify_backend.product.entity.Category;
-import fit.iuh.laptify_backend.product.entity.Product;
-import fit.iuh.laptify_backend.product.entity.Sku;
+import fit.iuh.laptify_backend.product.entity.*;
 import fit.iuh.laptify_backend.product.repository.BrandRepository;
 import fit.iuh.laptify_backend.product.repository.CategoryRepository;
 import fit.iuh.laptify_backend.product.repository.ProductRepository;
@@ -152,7 +149,8 @@ public class ProductServiceImpl implements ProductService {
                     skuReq.getPrice(),
                     skuReq.getStockQuantity(),
                     0,
-                    imageUrls.get(i),
+                    // TODO: map imageUrls.get(i) to mediaMetadata
+                    null,
                     product
             );
 
@@ -191,7 +189,7 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .price(firstSku.getPrice())
                 .totalPurchases(firstSku.getTotalPurchases())
-                .imageUrl(firstSku.getImageUrl())
+                .mediaMetadata(firstSku.getMediaMetadata().getFirst())
                 .build();
     }
 
@@ -202,7 +200,6 @@ public class ProductServiceImpl implements ProductService {
                         .color(sku.getColor())
                         .price(sku.getPrice())
                         .stockQuantity(sku.getStockQuantity())
-                        .imageUrl(sku.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
 
