@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import CategorySidebar from './components/CategorySidebar';
 import FeaturedShowcase from './components/FeaturedShowcase';
 import BestSellingSection from './components/BestSellingSection';
@@ -16,24 +17,46 @@ const HomePage = () => {
           {/* Category Sidebar */}
           <CategorySidebar />
 
-          {/* Hero Banner */}
+          {/* Hero Banner - ASUS ROG Promo */}
           <div className='lg:col-span-3'>
-            <div className='bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-8 md:p-12 h-full flex items-center justify-between overflow-hidden relative'>
-              <div className='z-10 text-white flex-1'>
-                <div className='text-sm font-semibold text-red-500 mb-2'>
-                  ROG WING STING SCAL
+            <div className='bg-black rounded-lg overflow-hidden flex items-center justify-between h-full relative'>
+              {/* Left Content */}
+              <div className='z-10 text-white flex-1 p-8 md:p-12'>
+                {/* ASUS Logo/Brand */}
+                <div className='text-sm font-semibold text-white mb-4 opacity-90'>
+                  ASUS Rog Strix Scar
                 </div>
-                <h2 className='text-3xl md:text-4xl font-bold mb-4'>
-                  Voucher giảm đến 10%
+                
+                {/* Main Headline */}
+                <h2 className='text-4xl md:text-5xl font-bold mb-6 leading-tight'>
+                  Voucher giảm<br />đến 10%
                 </h2>
-                <button className='bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition'>
+                
+                {/* CTA Button */}
+                <Link
+                  to='/products/search'
+                  className='inline-flex items-center text-white font-semibold text-base hover:text-red-500 transition'
+                >
                   Mua ngay
-                </button>
+                  <span className='ml-2 text-xl'>→</span>
+                </Link>
               </div>
 
-              {/* Decorative element */}
-              <div className='absolute right-0 top-0 opacity-20 text-white text-6xl font-bold'>
-                ⚡
+              {/* Right Image */}
+              <div className='hidden md:flex items-center justify-center flex-1 h-full relative overflow-hidden'>
+                <img 
+                  src='/src/assets/asus-rog-strix.png' 
+                  alt='ASUS ROG Strix Scar'
+                  className='h-full w-full object-cover object-right'
+                />
+              </div>
+
+              {/* Carousel Dots */}
+              <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2'>
+                <div className='w-3 h-3 rounded-full bg-gray-400'></div>
+                <div className='w-3 h-3 rounded-full bg-gray-400'></div>
+                <div className='w-3 h-3 rounded-full bg-red-500'></div>
+                <div className='w-3 h-3 rounded-full bg-gray-400'></div>
               </div>
             </div>
           </div>
