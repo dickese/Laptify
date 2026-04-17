@@ -4,14 +4,16 @@ import { searchCategories } from '@/data/mockSearchProducts';
 
 const CategorySidebar = () => {
   return (
-    <div className='w-48 bg-white rounded-lg border border-gray-200 p-6 h-fit'>
-      <h3 className='text-lg font-bold text-gray-900 mb-6'>Danh mục</h3>
-      <ul className='space-y-3'>
-        {searchCategories.map((category) => (
-          <li key={category.id}>
+    <div className='w-48 bg-white h-fit'>
+      <h3 className='text-sm font-bold text-gray-900 mb-4 pb-3 border-b border-gray-200'>
+        Thể loại
+      </h3>
+      <ul className='space-y-0'>
+        {searchCategories.map((category, index) => (
+          <li key={category.id} className={index < searchCategories.length - 1 ? 'border-b border-gray-200' : ''}>
             <Link
               to={`/products/search?category=${category.value}`}
-              className='text-gray-700 hover:text-red-600 hover:font-semibold transition text-sm'
+              className='block text-sm text-gray-700 hover:text-red-600 transition py-3'
             >
               {category.label}
             </Link>

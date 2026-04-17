@@ -12,41 +12,40 @@ const KeyboardShowcase = () => {
 
   return (
     <div className='mb-12'>
-      {/* Feature Banner */}
-      <div className='bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-12 flex items-center justify-between overflow-hidden relative'>
+      {/* Black Advertisement Banner */}
+      <div className='bg-black rounded-lg p-8 md:p-12 lg:p-16 flex items-center justify-between overflow-hidden'>
         {/* Left Content */}
-        <div className='z-10 text-white flex-1'>
-          <div className='text-sm font-semibold text-emerald-400 mb-2'>
+        <div className='text-white flex-1 max-w-md'>
+          <div className='text-xs font-semibold text-emerald-400 mb-2 tracking-widest'>
             NÂNG CẤP GỎ PHÍM
           </div>
-          <h2 className='text-4xl font-bold mb-8 max-w-md'>
+          <h2 className='text-3xl md:text-4xl font-bold mb-8'>
             Nâng cấp gõ phím của bạn
           </h2>
 
           {/* Feature Icons */}
-          <div className='flex gap-6 mb-8'>
+          <div className='flex gap-4 mb-8'>
             {features.map((feature, idx) => (
-              <div key={idx} className='flex flex-col items-center gap-2'>
-                <div className='w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center'>
-                  <feature.icon className='text-emerald-400' size={24} />
-                </div>
-                <span className='text-sm text-gray-400'>{feature.label}</span>
+              <div key={idx} className='flex items-center justify-center w-12 h-12 rounded-full bg-gray-800 border border-gray-700'>
+                <feature.icon className='text-emerald-400' size={20} />
               </div>
             ))}
           </div>
 
           {/* CTA Button */}
           <Link
-            to='/products/search?category=ban-phim'
+            to='/products/search'
             className='inline-block bg-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition'
           >
             Mua ngay
           </Link>
         </div>
 
-        {/* Right side - decorative image placeholder */}
-        <div className='absolute right-0 top-1/2 -translate-y-1/2 opacity-30'>
-          <div className='w-64 h-64 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full blur-3xl'></div>
+        {/* Right side - keyboard image placeholder */}
+        <div className='hidden lg:flex items-center justify-center flex-1'>
+          <div className='w-80 h-48 bg-gray-900 rounded-lg flex items-center justify-center border border-gray-700'>
+            <span className='text-gray-500 text-sm'>Keyboard Image</span>
+          </div>
         </div>
       </div>
     </div>
