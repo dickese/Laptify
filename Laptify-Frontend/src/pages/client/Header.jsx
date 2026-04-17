@@ -72,7 +72,7 @@ const Header = () => {
 
             {/* Wishlist Icon */}
             <Link
-              to="/wishlist"
+              to="/wish-list"
               className="flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-accent"
               aria-label="Yêu thích"
             >

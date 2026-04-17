@@ -1,25 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
-import { productSortOptions } from '@/data/mockSearchProducts';
-import ProductList from '../../common/product/ProductList';
 import { useLocation } from 'react-router-dom';
+import ProductList from '../../common/product/ProductList';
+import { userProductSortOptions } from '@/data/mockSearchProducts';
 import { useSelector } from 'react-redux';
 
-const ProductPage = ({ title }) => {
+const UserWishlistPage = () => {
   const location = useLocation();
   const page = location.search ? new URLSearchParams(location.search).get('page') : 1;
-  const productType = location.pathname.replace(/\/$/, '');
 
-  const endpoint = productType ? `http://localhost:8080/api/v1${productType}` : 'http://localhost:8080/api/v1/products/news';
-
-  const [productResponse, setProductResponse] = useState({
+  const endpoint = 'http://localhost:8080/api/v1/wishlists/products';
+  const [userWishlistResponse, setUserWishlistResponse] = useState({
     products: [],
     totalPages: 1,
   });
 
+  const totalWishlistProducts = useSelector((state) => state.wishlist.total);
+
   const [currentPage, setCurrentPage] = useState(parseInt(page) || 1);
   const itemsPerPage = 20;
 
-  const [sortBy, setSortBy] = useState('relevant');
+  const [sortBy, setSortBy] = useState('addedDate');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,7 +35,7 @@ const ProductPage = ({ title }) => {
         }
         const data = await response.json();
         console.log("fetching data: ", data);
-        setProductResponse(data);
+        setUserWishlistResponse(data);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -45,10 +45,10 @@ const ProductPage = ({ title }) => {
   }, [endpoint, currentPage]);
 
   // Sort products
-  const sortedProducts = useMemo(() => {
-    if (!productResponse.data) return [];
+  const sortedWishlistProducts = useMemo(() => {
+    if (!userWishlistResponse.data) return [];
 
-    const sorted = [...productResponse.data];
+    const sorted = [...userWishlistResponse.data];
     switch (sortBy) {
       case 'price-asc':
         return sorted.sort((a, b) => a.price - b.price);
@@ -58,11 +58,11 @@ const ProductPage = ({ title }) => {
         return sorted;
       case 'bestseller':
         return sorted.sort((a, b) => b.totalPurchases - a.totalPurchases);
-      case 'relevant':
+      case 'addedDate':
       default:
         return sorted;
     }
-  }, [sortBy, productResponse.data]);
+  }, [sortBy, userWishlistResponse.data]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -80,16 +80,16 @@ const ProductPage = ({ title }) => {
             Home
           </a>
           <span>/</span>
-          <span className='text-gray-800'>{title}</span>
+          <span className='text-gray-800'>Sản phẩm yêu thích</span>
         </div>
 
         <div className='lg:col-span-3'>
           <ProductList
-            products={sortedProducts}
-            title={title}
+            products={sortedWishlistProducts.map((wishlistProduct) => wishlistProduct.product)}
+            title={`Sản phẩm yêu thích: ${totalWishlistProducts}`}
             currentPage={currentPage}
-            totalPages={productResponse.totalPages}
-            sortOptions={productSortOptions}
+            totalPages={userWishlistResponse.totalPages}
+            sortOptions={userProductSortOptions}
             sortBy={sortBy}
             onPageChange={handlePageChange}
             onSortChange={setSortBy} />
@@ -99,4 +99,4 @@ const ProductPage = ({ title }) => {
   );
 };
 
-export default ProductPage;
+export default UserWishlistPage;

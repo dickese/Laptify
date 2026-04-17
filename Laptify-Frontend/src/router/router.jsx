@@ -12,6 +12,7 @@ import CartPage from '@/pages/user/cart-page/index.jsx';
 import ProductPage from '@/pages/client/product';
 import ProductDetailPage from '@/pages/client/product/detail/ProductDetailPage.jsx';
 import CheckoutPage from '@/pages/user/checkout-page/index.jsx';
+import UserWishlistPage from '@/pages/user/wishlist-page';
 
 export const router = createBrowserRouter([
     {
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
                         element: <ProductPage type={'product-by-category'} title={'Sản phẩm theo danh mục'} />,
                     },
                 ]
+            },
+            {
+                path: 'wish-list',
+                element: <UserWishlistPage />,
             },
             {
                 path: 'cart',

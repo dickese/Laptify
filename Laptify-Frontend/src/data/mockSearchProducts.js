@@ -161,9 +161,19 @@ export const searchBrands = [
   { id: 'ACER', value: 'acer', label: 'Acer' },
 ];
 
-export const sortOptions = [
+export const productSortOptions = [
   { value: 'relevant', label: 'Liên Quan' },
   { value: 'newest', label: 'Mới nhất' },
-  { value: 'bestseller', label: 'Bán chay' },
-  { value: 'price', label: 'Giá' },
+  { value: 'bestseller', label: 'Bán chạy' },
+  { value: 'price-asc', label: 'Giá (Tăng dần)' },
+  { value: 'price-desc', label: 'Giá (Giảm dần)' },
 ];
+
+export const userProductSortOptions = [
+  { value: 'addedDate', label: 'Mới thêm' },
+  { value: 'newest', label: 'Mới nhất' },
+  { value: 'bestseller', label: 'Bán chạy' },
+  { value: 'price-asc', label: 'Giá (Tăng dần)' },
+  { value: 'price-desc', label: 'Giá (Giảm dần)' },
+];
+

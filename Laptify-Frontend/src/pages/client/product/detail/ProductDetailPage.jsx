@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setItems } from '@/feature/checkout/checkoutSlice';
 import ProductImageGallery from './ProductImageGallery';
 import ColorVariantSelector from './ColorVariantSelector';
 import QuantitySelector from './QuantitySelector';
-import ProductCard from '../ProductCard';
 import { Heart, Truck, RotateCcw } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import ProductCard from '@/pages/common/product/ProductCard';
+import { addItem, removeItem } from '@/feature/wishlist/wishlistThunk';
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const isWishlisted = useSelector((state) => state.wishlist.productIdMap[productId]);
 
   const [productDetail, setProductDetail] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -22,8 +25,6 @@ const ProductDetailPage = () => {
   const [currentSelectVariant, setCurrentSelectVariant] = useState(
     productDetail?.skus?.[0] || null
   );
-
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -38,7 +39,6 @@ const ProductDetailPage = () => {
         return;
       }
       const data = await product.json();
-      console.log("Fetched product detail: ", data);
 
       setProductDetail(data);
       setIsLoading(false);
@@ -51,7 +51,6 @@ const ProductDetailPage = () => {
       const fetchRelatedProducts = async (categoryId) => {
         const response = await fetch(`http://localhost:8080/api/v1/products/${productId}/related?category_id=${categoryId}&size=4`);
         const data = await response.json();
-        console.log("Fetched related products: ", data);
 
         const relatedProducts = data.data;
         setRelatedProducts(relatedProducts);
@@ -61,22 +60,6 @@ const ProductDetailPage = () => {
       fetchRelatedProducts(productDetail.categoryId);
     }
   }, [productDetail]);
-
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <p className='text-gray-600'>Đang tải...</p>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <p className='text-gray-600'>Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.</p>
-      </div>
-    );
-  }
 
   const handleVariantChange = (variant) => {
     setCurrentSelectVariant(variant);
@@ -101,6 +84,32 @@ const ProductDetailPage = () => {
     navigate('/checkout');
   };
 
+  const handleWishlistClick = (e) => {
+    e.stopPropagation();
+
+    if (isWishlisted) {
+      dispatch(removeItem({ productId: productDetail.id }));
+    } else {
+      dispatch(addItem({ productId: productDetail.id }));
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-96'>
+        <p className='text-gray-600'>Đang tải...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className='flex items-center justify-center h-96'>
+        <p className='text-gray-600'>Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.</p>
+      </div>
+    );
+  }
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -109,7 +118,6 @@ const ProductDetailPage = () => {
   };
 
   if (!productDetail) {
-    console.log("Product detail is null or undefined");
     return (
       <div className='flex items-center justify-center h-96'>
         <p className='text-gray-600'>Đang tải...</p>
@@ -181,7 +189,7 @@ const ProductDetailPage = () => {
               Mua ngay
             </button>
             <button
-              onClick={() => setIsWishlisted(!isWishlisted)}
+              onClick={handleWishlistClick}
               className={`px-6 py-3 rounded border-2 transition ${isWishlisted
                 ? 'border-red-600 bg-red-50'
                 : 'border-gray-300 hover:border-gray-400'

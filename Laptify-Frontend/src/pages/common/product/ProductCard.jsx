@@ -1,9 +1,14 @@
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem, removeItem } from '@/feature/wishlist/wishlistThunk';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const isWishlisted = useSelector((state) => state.wishlist.productIdMap[product.id]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -19,8 +24,11 @@ const ProductCard = ({ product }) => {
   const handleWishlistClick = (e) => {
     e.stopPropagation();
 
-    // TODO: Implement wishlist functionality
-    console.log('Wishlist clicked for product:', product.id);
+    if (isWishlisted) {
+      dispatch(removeItem({ productId: product.id }));
+    } else {
+      dispatch(addItem({ productId: product.id }));
+    }
   }
 
   const handleCartClick = (e) => {
@@ -29,8 +37,6 @@ const ProductCard = ({ product }) => {
     //  TODO: Implement add to cart functionality
     console.log('Add to cart clicked for product:', product.id);
   }
-
-  console.log("Rendering ProductCard for product: ", product);
 
   return (
     <div
@@ -49,7 +55,11 @@ const ProductCard = ({ product }) => {
         <div className='absolute top-3 right-3 flex flex-col gap-2'>
           <button
             onClick={handleWishlistClick}
-            className='bg-white rounded-full p-2 shadow hover:bg-red-600 hover:text-white transition'
+            // className='bg-white rounded-full p-2 shadow hover:bg-red-600 hover:text-white transition'
+            className={isWishlisted ?
+              'bg-red-600 text-white rounded-full p-2 shadow transition hover:bg-red-300 hover:text-white' :
+              'bg-white rounded-full p-2 shadow hover:bg-red-300 hover:text-white transition'
+            }
           >
             <Heart size={18} />
           </button>
