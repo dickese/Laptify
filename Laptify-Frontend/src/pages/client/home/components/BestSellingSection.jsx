@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ProductCard from "@/pages/client/product/ProductCard";
+import ProductCard from "@/pages/common/product/ProductCard";
 import { mockSearchProducts } from "@/data/mockSearchProducts";
 import { getRandomProducts } from "../utils/homePageUtils";
 

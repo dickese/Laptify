@@ -12,18 +12,15 @@ const KeyboardShowcase = () => {
 
   return (
     <div className="mb-12">
-      {/* Black Advertisement Banner */}
       <div className="bg-black rounded-lg p-8 md:p-12 lg:p-16 flex items-center justify-between overflow-hidden">
-        {/* Left Content */}
         <div className="text-white flex-1 max-w-md">
           <div className="text-xs font-semibold text-emerald-400 mb-2 tracking-widest">
-            NÂNG CẤP GỎ PHÍM
+            Danh mục
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-8">
-            Nâng cấp gõ phím của bạn
+            Nâng cấp trải nghiệm gõ phím của bạn
           </h2>
 
-          {/* Feature Icons */}
           <div className="flex gap-4 mb-8">
             {features.map((feature, idx) => (
               <div
@@ -35,7 +32,6 @@ const KeyboardShowcase = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
           <Link
             to="/products/search"
             className="inline-block bg-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition"
@@ -44,13 +40,13 @@ const KeyboardShowcase = () => {
           </Link>
         </div>
 
-        {/* Right side - keyboard image placeholder */}
-        <div className="hidden lg:flex items-center justify-center flex-1">
-          <div className="w-80 h-48 bg-gray-900 rounded-lg flex items-center justify-center border border-gray-700">
-            <span className="text-gray-500 text-sm">
-              <img src="/src/assets/magic-keyboard.png" alt="" />
-            </span>
-          </div>
+        {/* Right side - keyboard image */}
+        <div className="hidden lg:block flex-1 relative min-h-[300px]">
+          <img
+            src="/src/assets/magic-keyboard.png"
+            alt="Magic Keyboard"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-full max-w-[550px] h-auto object-contain drop-shadow-2xl"
+          />
         </div>
       </div>
     </div>

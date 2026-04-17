@@ -16,9 +16,8 @@ const FeatureCard = ({
       to={buttonLink}
       className={`relative bg-black rounded-lg overflow-hidden group ${
         isLarge ? "lg:row-span-2" : ""
-      } h-full min-h-[300px] lg:min-h-auto flex flex-col justify-between`}
+      } h-full min-h-[200px] md:min-h-[220px] lg:min-h-[240px] flex flex-col justify-between`}
     >
-      {/* Black background with image overlay */}
       <div className="absolute inset-0 bg-black">
         {imagePath && (
           <img
@@ -29,11 +28,9 @@ const FeatureCard = ({
         )}
       </div>
 
-      {/* Content overlay */}
       <div className="relative z-10 p-6 md:p-8 text-white flex flex-col justify-between h-full">
         <div></div>
 
-        {/* Title and Description (bottom positioned) */}
         <div>
           <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-red-400 transition">
             {title}
@@ -43,13 +40,10 @@ const FeatureCard = ({
               {description}
             </p>
           )}
-          <Link
-            to={buttonLink}
-            className="inline-flex items-center gap-2 text-white font-semibold text-sm hover:text-red-400 transition border-b border-white hover:border-red-400 pb-1"
-          >
+          <div className="inline-flex items-center gap-2 text-white font-semibold text-sm border-b border-white pb-1">
             {buttonText}
             {showSparkle && <Sparkles size={14} />}
-          </Link>
+          </div>
         </div>
       </div>
     </Link>
@@ -89,7 +83,7 @@ const FeaturedShowcase = () => {
       title: "Mice",
       description: "Ergonomic Daily Comfort",
       imagePath: "/src/assets/logitech.png",
-      buttonText: "Mua ngay",
+      buttonText: "Mua Ngay",
       buttonLink: "/products/search",
       isLarge: false,
     },
@@ -97,7 +91,6 @@ const FeaturedShowcase = () => {
 
   return (
     <div className="mb-12">
-      {/* Section Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-1 h-8 bg-red-600 rounded"></div>
@@ -106,28 +99,24 @@ const FeaturedShowcase = () => {
         <h2 className="text-4xl font-bold text-gray-900">Sản phẩm mới</h2>
       </div>
 
-      {/* Grid Layout: 1x2 left side (large), 2x1 right side (smaller) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Large card - left side, spans 2 rows on desktop */}
-        <div className="lg:col-span-1 lg:row-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+        <div className="lg:col-span-6 lg:row-span-2">
           <FeatureCard {...cards[0]} />
         </div>
 
-        {/* Top right card */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-6">
           <FeatureCard {...cards[1]} />
         </div>
 
-        {/* Bottom right cards - 2 columns */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-3">
           <FeatureCard {...cards[2]} />
         </div>
-        <div className="lg:col-span-1">
+
+        <div className="lg:col-span-3">
           <FeatureCard {...cards[3]} />
         </div>
       </div>
 
-      {/* View All Button */}
       <div className="text-center">
         <button className="bg-red-600 text-white px-12 py-3 rounded-lg font-semibold hover:bg-red-700 transition text-base">
           Xem thêm

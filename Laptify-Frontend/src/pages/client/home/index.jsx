@@ -22,9 +22,18 @@ const HomePage = () => {
             <div className="bg-black rounded-lg overflow-hidden flex items-center justify-between h-full relative">
               {/* Left Content */}
               <div className="z-10 text-white flex-1 p-8 md:p-12">
-                {/* ASUS Logo/Brand */}
-                <div className="text-sm font-semibold text-white mb-4 opacity-90">
-                  ASUS Rog Strix Scar
+                {/* Brand Header: Logo + Text */}
+                <div className="flex items-center gap-3 mb-4 opacity-90">
+                  {/* Logo Container */}
+                  <img
+                    src="/src/assets/rog-strix-logo.png"
+                    alt="ROG Logo"
+                    className="w-8 h-8 object-contain" // Điều chỉnh kích thước logo tại đây
+                  />
+                  {/* Brand Text */}
+                  <span className="text-sm font-semibold uppercase tracking-wider">
+                    ASUS Rog Strix Scar
+                  </span>
                 </div>
 
                 {/* Main Headline */}
@@ -44,12 +53,12 @@ const HomePage = () => {
                 </Link>
               </div>
 
-              {/* Right Image */}
-              <div className="hidden md:flex items-center justify-center flex-1 h-full relative overflow-hidden">
+              {/* Right Image Container */}
+              <div className="hidden md:block relative flex-1 h-full">
                 <img
                   src="/src/assets/asus-rog-strix.png"
                   alt="ASUS ROG Strix Scar"
-                  className="h-full w-full object-cover object-right"
+                  className="absolute -right-21 top-1/2 -translate-y-1/2 h-[120%] w-auto max-w-none object-contain"
                 />
               </div>
 
