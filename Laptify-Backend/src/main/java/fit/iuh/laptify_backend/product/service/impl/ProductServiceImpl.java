@@ -36,9 +36,17 @@ public class ProductServiceImpl implements ProductService {
     private final BrandRepository brandRepository;
 
     @Override
+    public PageResponse<List<ProductResponse>> getAllProducts(PageRequest page) {
+        org.springframework.data.domain.PageRequest pageable = toPageable(page);
+        Page<Product> products = productRepository.findAllProducts(pageable);
+        Page<ProductResponse> productResponses = products.map(this::mapToResponse);
+        return buildPageResponse(productResponses);
+    }
+
+    @Override
     public PageResponse<List<ProductResponse>> getNewProducts(PageRequest page) {
         org.springframework.data.domain.PageRequest pageable = toPageable(page, Sort.by("createdAt").descending());
-        Page<Product> products = productRepository.findAllByOrderByCreatedAtDesc(pageable);
+        Page<Product> products = productRepository.findNewProducts(pageable);
         Page<ProductResponse> productResponses = products.map(this::mapToResponse);
         return buildPageResponse(productResponses);
     }
@@ -200,6 +208,7 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .price(firstSku.getPrice())
                 .totalPurchases(firstSku.getTotalPurchases())
+                .stockQuantity(firstSku.getStockQuantity())
                 .mediaMetadata(firstSku.getMediaMetadata() != null ? firstSku.getMediaMetadata().getFirst() : null)
                 .build();
     }

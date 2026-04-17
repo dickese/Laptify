@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface ProductService {
     ProductResponse createProduct(ProductCreationRequest request);
+    PageResponse<List<ProductResponse>> getAllProducts(PageRequest page);
     PageResponse<List<ProductResponse>> getNewProducts(PageRequest page);
     PageResponse<List<ProductResponse>> getBestSellerProducts(PageRequest page);
     PageResponse<List<ProductResponse>> getProductsByCategoryId(Long categoryId, PageRequest page);

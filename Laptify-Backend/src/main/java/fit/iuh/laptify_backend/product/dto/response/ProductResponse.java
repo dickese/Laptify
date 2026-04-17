@@ -15,5 +15,6 @@ public class ProductResponse {
     private String name;
     private BigDecimal price;
     private Integer totalPurchases;
+    private Integer stockQuantity;
     private MediaMetadata mediaMetadata;
 }

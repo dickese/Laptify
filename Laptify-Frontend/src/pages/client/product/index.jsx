@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 
 const ProductPage = ({ title }) => {
   const location = useLocation();
+  const page = location.search ? new URLSearchParams(location.search).get('page') : 1;
   const productType = location.pathname.replace(/\/$/, '');
 
   const endpoint = productType ? `http://localhost:8080/api/v1${productType}` : 'http://localhost:8080/api/v1/products/news';
@@ -13,7 +14,7 @@ const ProductPage = ({ title }) => {
     totalPages: 1,
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(parseInt(page) || 1);
   const itemsPerPage = 20;
 
   const [sortBy, setSortBy] = useState('relevant');
@@ -59,6 +60,13 @@ const ProductPage = ({ title }) => {
     }
   }, [sortBy, productResponse.data]);
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    const url = new URL(window.location);
+    url.searchParams.set('page', newPage);
+    window.history.pushState({}, '', url);
+  }
+
   return (
     <div className='bg-gray-50 min-h-screen py-8'>
       <div className='max-w-7xl mx-auto px-4'>
@@ -78,7 +86,7 @@ const ProductPage = ({ title }) => {
             currentPage={currentPage}
             totalPages={productResponse.totalPages}
             sortBy={sortBy}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
             onSortChange={setSortBy} />
         </div>
       </div>

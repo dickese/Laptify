@@ -34,7 +34,7 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size)
     {
         PageRequest pageRequest = new PageRequest(page, size);
-        return ResponseEntity.ok(productService.getNewProducts(pageRequest));
+        return ResponseEntity.ok(productService.getAllProducts(pageRequest));
     }
 
     @GetMapping("/news")

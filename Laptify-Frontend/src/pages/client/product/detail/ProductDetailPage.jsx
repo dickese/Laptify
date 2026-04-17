@@ -139,8 +139,8 @@ const ProductDetailPage = () => {
             <h1 className='text-3xl font-bold text-gray-800 mb-2'>{productDetail.name}</h1>
             <div className='flex items-center gap-3'>
               <span className='text-sm text-gray-600'>{currentSelectVariant?.totalPurchases} lượt mua</span>
-              <span className='text-sm bg-green-100 text-green-700 px-3 py-1 rounded'>
-                Còn hàng
+              <span className='text-sm bg-green-100 px-3 py-1 rounded font-medium' style={{ backgroundColor: currentSelectVariant?.stockQuantity > 0 ? '#d1fae5' : '#fef2f2', color: currentSelectVariant?.stockQuantity > 0 ? '#065f46' : '#991b1b' }}>
+                {currentSelectVariant?.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
               </span>
             </div>
           </div>
