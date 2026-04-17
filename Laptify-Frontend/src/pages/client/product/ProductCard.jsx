@@ -30,6 +30,8 @@ const ProductCard = ({ product }) => {
     console.log('Add to cart clicked for product:', product.id);
   }
 
+  console.log("Rendering ProductCard for product: ", product);
+
   return (
     <div
       onClick={handleCardClick}
@@ -58,6 +60,16 @@ const ProductCard = ({ product }) => {
             <ShoppingCart size={18} />
           </button>
         </div>
+
+        {/* Out of Stock Badge */}
+        {product.stockQuantity == 0 && (
+          console.log("Product is out of stock: ", product),
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <div className='bg-black rounded-full w-24 h-24 flex items-center justify-center shadow-lg border-4 border-white'>
+              <p className='text-white font-bold text-center'>Hết hàng</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Product Info */}

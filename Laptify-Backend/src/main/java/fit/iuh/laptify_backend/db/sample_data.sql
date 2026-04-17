@@ -124,9 +124,9 @@ VALUES ('KB001-BLK', 'Black', JSON_ARRAY(JSON_OBJECT('url', '/images/kb001-blk.j
        ('KB004-BLK', 'Black', JSON_ARRAY(JSON_OBJECT('url', '/images/kb004-blk.jpg', 'publicId', 'kb004-blk')), 4776000, 18, 9, 88),
        ('KB004-RD', 'Red', JSON_ARRAY(JSON_OBJECT('url', '/images/kb004-rd.jpg', 'publicId', 'kb004-rd')), 4776000, 15, 9, 69),
        ('KB004-BLU', 'Blue', JSON_ARRAY(JSON_OBJECT('url', '/images/kb004-blu.jpg', 'publicId', 'kb004-blu')), 4776000, 12, 9, 54),
-       ('KB005-SLV', 'Silver', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-slv.jpg', 'publicId', 'kb005-slv')), 1896000, 40, 10, 142),
-       ('KB005-WHT', 'White', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-wht.jpg', 'publicId', 'kb005-wht')), 1896000, 38, 10, 118),
-       ('KB005-BLK', 'Black', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-blk.jpg', 'publicId', 'kb005-blk')), 1896000, 36, 10, 95);
+       ('KB005-SLV', 'Silver', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-slv.jpg', 'publicId', 'kb005-slv')), 1896000, 0, 10, 142),
+       ('KB005-WHT', 'White', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-wht.jpg', 'publicId', 'kb005-wht')), 1896000, 0, 10, 118),
+       ('KB005-BLK', 'Black', JSON_ARRAY(JSON_OBJECT('url', '/images/kb005-blk.jpg', 'publicId', 'kb005-blk')), 1896000, 0, 10, 95);
 
 -- Insert SKUs - Mouse (3 colors per product, 5 products = 15 SKUs)
 -- Product IDs 11-15

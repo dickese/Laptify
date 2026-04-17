@@ -5,6 +5,7 @@ import ProductList from '../ProductList';
 
 const SearchPage = () => {
   const location = useLocation();
+  const page = location.search ? new URLSearchParams(location.search).get('page') : 1;
   const productType = location.pathname;
 
   const queryParams = new URLSearchParams(location.search);
@@ -17,7 +18,7 @@ const SearchPage = () => {
     totalPages: 1,
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(parseInt(page) || 1);
   const itemsPerPage = 20;
 
   const [filters, setFilters] = useState({
@@ -80,6 +81,13 @@ const SearchPage = () => {
     setFilters(newFilters);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    const url = new URL(window.location);
+    url.searchParams.set('page', newPage);
+    window.history.pushState({}, '', url);
+  }
+
   return (
     <div className='bg-gray-50 min-h-screen py-8'>
       <div className='max-w-7xl mx-auto px-4'>
@@ -107,7 +115,7 @@ const SearchPage = () => {
               currentPage={currentPage}
               totalPages={productResponse.totalPages}
               sortBy={sortBy}
-              onPageChange={setCurrentPage}
+              onPageChange={handlePageChange}
               onSortChange={setSortBy} />
           </div>
         </div>
