@@ -1,10 +1,9 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { sortOptions } from '@/data/mockSearchProducts';
 import ProductCard from './ProductCard';
 import Pagination from '@/components/custom/Paganation';
 
-const ProductList = (({ title, products, currentPage, totalPages, sortBy, onPageChange, onSortChange }) => {
+const ProductList = (({ title, products, currentPage, totalPages, sortOptions, sortBy, onPageChange, onSortChange }) => {
   // Pagination
   const handlePreviousPage = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
@@ -67,7 +66,10 @@ const ProductList = (({ title, products, currentPage, totalPages, sortBy, onPage
         <div>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
             ))}
           </div>
 

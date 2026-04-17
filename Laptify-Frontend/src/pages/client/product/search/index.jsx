@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import SearchFilter from './SearchFilter';
 import { useLocation } from 'react-router-dom';
-import ProductList from '../ProductList';
+import ProductList from '../../../common/product/ProductList';
+import { productSortOptions } from '@/data/mockSearchProducts';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -65,12 +66,14 @@ const SearchPage = () => {
 
     const sorted = [...productResponse.data];
     switch (sortBy) {
-      case 'price':
+      case 'price-asc':
         return sorted.sort((a, b) => a.price - b.price);
+      case 'price-desc':
+        return sorted.sort((a, b) => b.price - a.price);
       case 'newest':
-        return sorted.reverse();
+        return sorted;
       case 'bestseller':
-        return sorted.sort((a, b) => b.purchaseCount - a.purchaseCount);
+        return sorted.sort((a, b) => b.totalPurchases - a.totalPurchases);
       case 'relevant':
       default:
         return sorted;
@@ -114,6 +117,7 @@ const SearchPage = () => {
               title={`Kết quả tìm kiếm cho "${searchQuery}"`}
               currentPage={currentPage}
               totalPages={productResponse.totalPages}
+              sortOptions={productSortOptions}
               sortBy={sortBy}
               onPageChange={handlePageChange}
               onSortChange={setSortBy} />

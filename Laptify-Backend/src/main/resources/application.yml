@@ -1,9 +1,5 @@
 server:
   port: 8080
-app:
-  cors:
-    enabled: true
-    allowed-origins: "*"
 spring:
   servlet:
     multipart:
