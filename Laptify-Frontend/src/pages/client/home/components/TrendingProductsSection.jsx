@@ -8,13 +8,16 @@ import { getRandomProducts } from '../utils/homePageUtils';
 const TrendingProductsSection = () => {
   const [currentPage, setCurrentPage] = useState(0);
   
-  // Get 8 random products for trending
+  // Get 8 random products for trending (2 rows x 4 columns)
   const trendingProducts = getRandomProducts(mockSearchProducts, 8);
-  const productsPerPage = 4;
-  const totalPages = Math.ceil(trendingProducts.length / productsPerPage);
   
-  const startIdx = currentPage * productsPerPage;
-  const visibleProducts = trendingProducts.slice(startIdx, startIdx + productsPerPage);
+  // Display all 8 products in 2 rows at once
+  const itemsPerRow = 4;
+  const pageSize = itemsPerRow * 2; // 8 items per page (2 rows)
+  const totalPages = Math.ceil(trendingProducts.length / pageSize);
+  
+  const startIdx = currentPage * pageSize;
+  const visibleProducts = trendingProducts.slice(startIdx, startIdx + pageSize);
 
   const handleNext = () => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -55,7 +58,7 @@ const TrendingProductsSection = () => {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Grid - 2 rows */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
         {visibleProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
