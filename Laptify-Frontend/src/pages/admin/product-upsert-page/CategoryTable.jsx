@@ -42,6 +42,7 @@ export default function CategoryTable({
       <div className='flex items-center justify-between mb-6'>
         <h2 className='text-xl font-semibold text-gray-900'>Phân loại</h2>
         <Button 
+          type='button'
           onClick={() => handleOpenDialog()}
           className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition font-medium text-sm'>
           <Plus />
@@ -116,6 +117,7 @@ export default function CategoryTable({
                   <td className='px-4 py-4 text-center'>
                     <div className='flex items-center justify-center gap-2'>
                       <button
+                        type='button'
                         onClick={() => onDelete(variant.id)}
                         className='p-2 text-red-600 hover:bg-red-50 rounded-md transition'
                         title='Xóa'
@@ -123,6 +125,7 @@ export default function CategoryTable({
                         <Trash2 size={18} />
                       </button>
                       <button
+                        type='button'
                         onClick={() => handleOpenDialog(variant)}
                         className='p-2 text-gray-600 hover:bg-gray-100 rounded-md transition'
                         title='Chỉnh sửa'
