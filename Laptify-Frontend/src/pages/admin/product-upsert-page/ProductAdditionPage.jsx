@@ -24,9 +24,14 @@ const ProductAdditionPage = () => {
     }));
   };
 
-  const handleVariantEdit = (variantId) => {
-    console.log('[v0] Edit variant:', variantId);
-    // Dialog will be implemented later
+  const handleVariantAdd = (variantData) => {
+    setVariants((prev) => [...prev, { ...variantData, id: Date.now() }]);
+  };
+
+  const handleVariantEdit = (updatedVariant) => {
+    setVariants((prev) =>
+      prev.map((v) => (v.id === updatedVariant.id ? updatedVariant : v))
+    );
   };
 
   const handleVariantDelete = (variantId) => {
@@ -79,6 +84,7 @@ const ProductAdditionPage = () => {
         {/* Category Table Section */}
         <CategoryTable
           variants={variants}
+          onAddVariant={handleVariantAdd}
           onEdit={handleVariantEdit}
           onDelete={handleVariantDelete}
         />
