@@ -10,12 +10,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCreationRequest {
-    private String customerName;
-    private String address;
-    private String phoneNumber;
-    private String email;
-    private boolean isSaved;
+    private CustomerInfo customer;
     private List<ProductInfo> products;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CustomerInfo{
+        private String name;
+        private String address;
+        private String phoneNumber;
+        private String email;
+        private boolean isSaved;
+    }
 
     @Getter
     @NoArgsConstructor

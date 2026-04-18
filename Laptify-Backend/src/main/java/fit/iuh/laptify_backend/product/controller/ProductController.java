@@ -11,19 +11,20 @@ import fit.iuh.laptify_backend.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/products")
 @Slf4j
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductCreationRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
     }

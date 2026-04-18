@@ -8,6 +8,9 @@ import {
   setCustomerInfo,
   clearCheckout,
 } from '@/feature/checkout/checkoutSlice.js';
+import { Button } from '@/components/ui/button.jsx';
+import { createOrder } from '@/services/orderApi.js';
+import { toast } from 'sonner';
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -66,27 +69,37 @@ const CheckoutPage = () => {
 
     setLoading(true);
     try {
-      // Dispatch customer info to Redux
       dispatch(setCustomerInfo(formData));
 
-      // TODO: Call API to create order
-      const orderData = {
-        customerInfo: formData,
-        items: cartItems,
-        total: total,
+      const orderCreationRequest = {
+        customer: {
+          name: formData.fullName,
+          address: formData.address,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          isSaved: formData.isSaved || false,
+        },
+        products: cartItems.map((item) => ({
+          productId: item.id,
+          skuCode: item.variant,
+          quantity: item.quantity,
+        })),
       };
 
-      console.log('Placing order:', orderData);
+      const formDataRequest = new FormData();
+      formDataRequest.append(
+        'orderCreationRequest',
+        JSON.stringify(orderCreationRequest)
+      );
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Placing order:', orderCreationRequest);
 
-      // Clear checkout and navigate
+      await createOrder(formDataRequest);
       dispatch(clearCheckout());
       navigate('/order-success');
+
     } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Đặt hàng thất bại. Vui lòng thử lại.');
+      toast.error(error, 'Đặt hàng thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -95,13 +108,15 @@ const CheckoutPage = () => {
   if (cartItems.length === 0) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <p className='text-gray-600 mb-4'>Giỏ hàng trống</p>
-        <button
+        <p className='text-gray-600 mb-4'>
+          Không tìm thấy thông tin thanh toán
+        </p>
+        <Button
           onClick={() => navigate('/cart')}
-          className='text-red-500 hover:text-red-600 font-semibold'
+          className='bg-orange-700 font-semibold cursor-pointer'
         >
           Quay lại giỏ hàng
-        </button>
+        </Button>
       </div>
     );
   }

@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import ProductInfo from './ProductInfo.jsx';
 import CategoryTable from './CategoryTable.jsx';
-import { categories, manufacturers, mockProducts } from '@/data/mockProducts.js';
+import { categories, brands, mockProducts } from '@/data/mockProducts.js';
+import { Button } from '@/components/ui/button.jsx';
 
 const ProductUpdatingPage = () => {
   const navigate = useNavigate();
@@ -13,8 +14,9 @@ const ProductUpdatingPage = () => {
     code: '',
     name: '',
     totalQuantity: '',
-    manufacturer: '',
-    category: '',
+    brandId: '',
+    categoryId: '',
+    description: '',
   });
 
   const [variants, setVariants] = useState([]);
@@ -28,8 +30,9 @@ const ProductUpdatingPage = () => {
         code: product.code,
         name: product.name,
         totalQuantity: product.quantity,
-        manufacturer: product.manufacturer,
-        category: product.category,
+        brandId: product.brandId || '',
+        categoryId: product.categoryId || '',
+        description: product.description,
       });
 
       // Mock variants data
@@ -72,9 +75,14 @@ const ProductUpdatingPage = () => {
     }));
   };
 
-  const handleVariantEdit = (variantId) => {
-    console.log('[v0] Edit variant:', variantId);
-    // Dialog will be implemented later
+  const handleVariantAdd = (variantData) => {
+    setVariants((prev) => [...prev, { ...variantData, id: Date.now() }]);
+  };
+
+  const handleVariantEdit = (updatedVariant) => {
+    setVariants((prev) =>
+      prev.map((v) => (v.id === updatedVariant.id ? updatedVariant : v))
+    );
   };
 
   const handleVariantDelete = (variantId) => {
@@ -114,9 +122,7 @@ const ProductUpdatingPage = () => {
           <ChevronLeft size={24} className='text-gray-700' />
         </button>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900'>
-            Quản lý sản phẩm
-          </h1>
+          <h1 className='text-3xl font-bold text-gray-900'>Quản lý sản phẩm</h1>
           <p className='text-gray-500 text-sm'>Cập nhật sản phẩm</p>
         </div>
       </div>
@@ -129,12 +135,13 @@ const ProductUpdatingPage = () => {
           formData={formData}
           onInputChange={handleInputChange}
           categories={categories}
-          manufacturers={manufacturers}
+          brands={brands}
         />
 
         {/* Category Table Section */}
         <CategoryTable
           variants={variants}
+          onAddVariant={handleVariantAdd}
           onEdit={handleVariantEdit}
           onDelete={handleVariantDelete}
         />

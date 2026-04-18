@@ -1,20 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import Pagination from '@/components/custom/Paganation.jsx';
 import ProductTable from '@/pages/admin/product-page/ProductTable.jsx';
 import ProductFilter from '@/pages/admin/product-page/ProductFilter.jsx';
-import { mockProducts, categories, manufacturers } from '@/data/mockProducts.js';
 import { Button } from '@/components/ui/button.jsx';
 import { Plus } from 'lucide-react';
+import { getProducts } from '@/services/productApi.js';
+import { getErrorMessage } from '@/lib/axiosClient.js';
+import { toast } from 'sonner';
 
 
 const ProductManagementPage = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState(mockProducts);
-  const [filteredProducts, setFilteredProducts] = useState(mockProducts);
+  const [isLoading, setIsLoading] = useState(true)
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try{
+        const res = (await getProducts({ page: 0, size: itemsPerPage })).data
+          .data;
+
+        setProducts(res)
+        setFilteredProducts(res)
+      }catch(e){
+        const message = getErrorMessage(e, "Lấy dánh sách sản phẩm thất bại")
+        toast.error(message)
+      }finally{
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  } ,[])
 
   const [filters, setFilters] = useState({
     productCode: '',
@@ -125,7 +147,7 @@ const ProductManagementPage = () => {
           onClick={() => navigate('/admin/product-addition')}
           className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition font-medium'
         >
-          <Plus/>
+          <Plus />
           Thêm sản phẩm
         </Button>
       </div>
@@ -136,8 +158,6 @@ const ProductManagementPage = () => {
         onEdit={handleEdit}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
-        categories={categories}
-        manufacturers={manufacturers}
       />
 
       <Pagination

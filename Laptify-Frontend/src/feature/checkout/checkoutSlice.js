@@ -10,6 +10,7 @@ const initialValue = {
     saveForNextTime: false,
   },
 };
+
 const checkoutSlice = createSlice({
   name: 'checkout',
   initialState: initialValue,
@@ -32,5 +33,6 @@ const checkoutSlice = createSlice({
     },
   },
 });
+
 export const { setItems, setCustomerInfo, clearCheckout } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

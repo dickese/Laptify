@@ -12,12 +12,12 @@ VALUES ('user1@example.com', 'Nguyen Van A', 'hashed_password_1', 2),
        ('admin@example.com', 'Admin User', 'hashed_password_admin', 1);
 
 -- Insert User Placement Infos
-INSERT INTO user_placement_infos (customer_name, phone_number, address, is_saved)
-VALUES ('Nguyen Van A', '0912345678', '123 Nguyen Hue, HCMC', 1),
-       ('Tran Thi B', '0987654321', '456 Tran Hung Dao, HCMC', 1),
-       ('Le Van C', '0901234567', '789 Hoang Van Thu, HCMC', 0),
-       ('Pham Thi D', '0923456789', '321 Ly Thuong Kiet, Hanoi', 1),
-       ('Hoang Van E', '0934567890', '654 Nguyen Trai, HCMC', 0);
+INSERT INTO user_placement_infos (customer_name, phone_number, address, email,is_saved)
+VALUES ('Nguyen Van A', '0912345678', '123 Nguyen Hue, HCMC', 'user1@example.com',1),
+       ('Tran Thi B', '0987654321', '456 Tran Hung Dao, HCMC', 'user2@example.com',1),
+       ('Le Van C', '0901234567', '789 Hoang Van Thu, HCMC', 'user3@example.com',0),
+       ('Pham Thi D', '0923456789', '321 Ly Thuong Kiet, Hanoi','user4@example.com', 1),
+       ('Hoang Van E', '0934567890', '654 Nguyen Trai, HCMC', 'admin@example.com',0);
 
 -- Insert Brands
 INSERT INTO brands (code, name, description, created_at)
@@ -51,44 +51,44 @@ VALUES (1, 'Laptop', 'Portable computing devices'),
        (5, 'Gamepad', 'Gaming controllers');
 
 -- Insert Products - Laptop (5 products)
-INSERT INTO products (name, description, brand_id, category_id, created_at)
-VALUES ('MacBook Pro 14', 'High-performance laptop', 1, 1, NOW()),
-       ('Dell XPS 13', 'Ultra-portable laptop', 2, 1, NOW()),
-       ('HP Pavilion 15', 'Affordable laptop', 3, 1, NOW()),
-       ('Lenovo ThinkPad X1', 'Business laptop', 4, 1, NOW()),
-       ('ASUS VivoBook 15', 'Budget-friendly laptop', 5, 1, NOW());
+INSERT INTO products (id, name, description, brand_id, category_id, created_at)
+VALUES (1,'MacBook Pro 14', 'High-performance laptop', 1, 1, NOW()),
+       (2,'Dell XPS 13', 'Ultra-portable laptop', 2, 1, NOW()),
+       (3,'HP Pavilion 15', 'Affordable laptop', 3, 1, NOW()),
+       (4,'Lenovo ThinkPad X1', 'Business laptop', 4, 1, NOW()),
+       (5,'ASUS VivoBook 15', 'Budget-friendly laptop', 5, 1, NOW());
 
 -- Insert Products - Keyboard (5 products)
-INSERT INTO products (name, description, brand_id, category_id, created_at)
-VALUES ('Corsair K95 Platinum', 'Mechanical gaming keyboard', 6, 2, NOW()),
-       ('Logitech MX Keys', 'Wireless keyboard', 7, 2, NOW()),
-       ('Razer BlackWidow', 'Gaming keyboard', 8, 2, NOW()),
-       ('SteelSeries Apex Pro', 'Adjustable switches keyboard', 9, 2, NOW()),
-       ('Apple Magic Keyboard', 'Wireless keyboard', 1, 2, NOW());
+INSERT INTO products (id, name, description, brand_id, category_id, created_at)
+VALUES (6,'Corsair K95 Platinum', 'Mechanical gaming keyboard', 6, 2, NOW()),
+       (7,'Logitech MX Keys', 'Wireless keyboard', 7, 2, NOW()),
+       (8,'Razer BlackWidow', 'Gaming keyboard', 8, 2, NOW()),
+       (9,'SteelSeries Apex Pro', 'Adjustable switches keyboard', 9, 2, NOW()),
+       (10,'Apple Magic Keyboard', 'Wireless keyboard', 1, 2, NOW());
 
 -- Insert Products - Mouse (5 products)
-INSERT INTO products (name, description, brand_id, category_id, created_at)
-VALUES ('Logitech G Pro X', 'Gaming mouse', 7, 3, NOW()),
-       ('Razer DeathAdder V3', 'High-precision mouse', 8, 3, NOW()),
-       ('Corsair Dark Core RGB', 'Wireless gaming mouse', 6, 3, NOW()),
-       ('Steelseries Rival 600', 'Esports mouse', 9, 3, NOW()),
-       ('Apple Magic Mouse', 'Wireless mouse', 1, 3, NOW());
+INSERT INTO products (id, name, description, brand_id, category_id, created_at)
+VALUES (11,'Logitech G Pro X', 'Gaming mouse', 7, 3, NOW()),
+       (12,'Razer DeathAdder V3', 'High-precision mouse', 8, 3, NOW()),
+       (13,'Corsair Dark Core RGB', 'Wireless gaming mouse', 6, 3, NOW()),
+       (14,'Steelseries Rival 600', 'Esports mouse', 9, 3, NOW()),
+       (15, 'Apple Magic Mouse', 'Wireless mouse', 1, 3, NOW());
 
 -- Insert Products - Headphone (5 products)
-INSERT INTO products (name, description, brand_id, category_id, created_at)
-VALUES ('Sony WH-1000XM5', 'Noise-cancelling headphones', 11, 4, NOW()),
-       ('Beats Studio Pro', 'Premium headphones', 12, 4, NOW()),
-       ('Sennheiser Momentum 4', 'High-quality audio', 13, 4, NOW()),
-       ('JBL Live Pro 2', 'True wireless earbuds', 14, 4, NOW()),
-       ('Bose QuietComfort 45', 'Comfort headphones', 15, 4, NOW());
+INSERT INTO products (id, name, description, brand_id, category_id, created_at)
+VALUES (16,'Sony WH-1000XM5', 'Noise-cancelling headphones', 11, 4, NOW()),
+       (17,'Beats Studio Pro', 'Premium headphones', 12, 4, NOW()),
+       (18,'Sennheiser Momentum 4', 'High-quality audio', 13, 4, NOW()),
+       (19,'JBL Live Pro 2', 'True wireless earbuds', 14, 4, NOW()),
+       (20, 'Bose QuietComfort 45', 'Comfort headphones', 15, 4, NOW());
 
 -- Insert Products - Gamepad (5 products)
-INSERT INTO products (name, description, brand_id, category_id, created_at)
-VALUES ('Xbox Series X Controller', 'Microsoft gaming controller', 16, 5, NOW()),
-       ('PlayStation 5 Controller', 'DualSense controller', 20, 5, NOW()),
-       ('Razer Wolverine V2 Pro', 'Professional gamepad', 8, 5, NOW()),
-       ('HyperX Clutch Gladiate', 'Gaming controller', 10, 5, NOW()),
-       ('Mad Catz C.A.T. 8', 'Fighting game controller', 18, 5, NOW());
+INSERT INTO products (id, name, description, brand_id, category_id, created_at)
+VALUES (21,'Xbox Series X Controller', 'Microsoft gaming controller', 16, 5, NOW()),
+       (22,'PlayStation 5 Controller', 'DualSense controller', 20, 5, NOW()),
+       (23,'Razer Wolverine V2 Pro', 'Professional gamepad', 8, 5, NOW()),
+       (24,'HyperX Clutch Gladiate', 'Gaming controller', 10, 5, NOW()),
+       (25, 'Mad Catz C.A.T. 8', 'Fighting game controller', 18, 5, NOW());
 
 -- Insert SKUs - Laptop (3 colors per product, 5 products = 15 SKUs)
 -- Product IDs 1-5

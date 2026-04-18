@@ -1,3 +1,4 @@
+import CustomArea from '@/components/custom/CustomArea.jsx';
 import CustomInput from '@/components/custom/CustomInput.jsx';
 import CustomSelect from '@/components/custom/CustomSelect.jsx';
 
@@ -6,12 +7,12 @@ export default function ProductInfo({
   formData,
   onInputChange,
   categories = [],
-  manufacturers = [],
+  brands = [],
 }) {
   const isAdditionMode = mode === 'addition';
 
   return (
-    <div className='bg-white rounded-lg shadow-md p-6 mb-6'>
+    <div className='bg-white rounded-lg shadow-md p-6 mb-6 space-y-4'>
       <h2 className='text-xl font-semibold text-gray-900 mb-6'>
         Thông tin sản phẩm
       </h2>
@@ -49,20 +50,31 @@ export default function ProductInfo({
 
         {/* Brand / Manufacturer */}
         <CustomSelect
+          type='button'
           label='Hãng sản xuất'
           placeholder='Chọn hãng sản xuất'
-          options={manufacturers}
-          value={formData.manufacturer || ''}
-          onChange={(value) => onInputChange('manufacturer', value)}
+          options={brands}
+          value={formData.brandId || ''}
+          onChange={(value) => onInputChange('brandId', value)}
         />
 
         {/* Category */}
         <CustomSelect
+          type='button'
           label='Danh mục'
           placeholder='Chọn danh mục'
           options={categories}
-          value={formData.category || ''}
-          onChange={(value) => onInputChange('category', value)}
+          value={formData.categoryId || ''}
+          onChange={(value) => onInputChange('categoryId', value)}
+        />
+      </div>
+
+      <div className=''>
+        <CustomArea
+          label={'Mô tả'}
+          placeholder={'Viết một đoạn mô tả ngắn về sản phẩm'}
+          value={formData.description || ''}
+          onChange={(e) => onInputChange('description', e.target.value)}
         />
       </div>
     </div>

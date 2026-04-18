@@ -51,7 +51,7 @@ export default function ProductTable({
               currentItems.map((product) => (
                 <tr key={product.id} className='hover:bg-gray-50 transition'>
                   <td className='px-6 py-4 text-sm text-gray-900'>
-                    {product.code}
+                    {product.id}
                   </td>
                   <td className='px-6 py-4 text-sm text-gray-900'>
                     {product.name}

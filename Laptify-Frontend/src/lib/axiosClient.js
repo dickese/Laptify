@@ -6,3 +6,10 @@ export const axiosClient = axios.create({
         "Content-Type": "application/json",
     },
 })
+
+
+export const getErrorMessage = (err, message) => {
+  let res = message;
+  if (axios.isAxiosError(err)) res = err.response?.data.message || message;
+  return res;
+};

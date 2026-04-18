@@ -25,9 +25,24 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Cart cart;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<UserPlacementInfo> userPlacementInfos;
+
+    public User(String email, String name, String password) {
+        this.password = password;
+        this.email = email;
+        this.name = name;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+        if (cart != null) {
+            cart.setUser(this);
+        }
+    }
 }

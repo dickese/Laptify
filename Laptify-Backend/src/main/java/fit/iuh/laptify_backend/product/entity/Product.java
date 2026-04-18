@@ -15,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false, length = 255)
@@ -42,7 +41,8 @@ public class Product {
     @ToString.Exclude
     private List<Sku> skus = new ArrayList<>();
 
-    public Product(String name, String description, Category category, Brand brand) {
+    public Product(Long id, String name, String description, Category category, Brand brand) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;

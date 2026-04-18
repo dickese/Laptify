@@ -4,6 +4,7 @@ import Header from './Header.jsx';
 import Footer from './Footer.jsx';
 import { useDispatch } from 'react-redux';
 import { fetchUserWishlist } from '@/feature/wishlist/wishlistThunk.js';
+import { getCart } from '@/feature/cart/cartThunk.js';
 
 const RootPage = () => {
 
@@ -16,11 +17,12 @@ const RootPage = () => {
     if (isAuthenticated) {
       console.log("Fetching user wishlist...");
       dispatch(fetchUserWishlist());
+      dispatch(getCart());
     } else {
       console.log("User not authenticated, skipping wishlist fetch.");
     }
   }, [dispatch, isAuthenticated]);
-
+  
   return (
     <div className='flex min-h-screen flex-col'>
       <Header />

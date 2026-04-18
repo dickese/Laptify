@@ -92,21 +92,32 @@ export const mockProducts = [
 ];
 
 export const categories = [
-  { value: 'laptop', label: 'Laptop' },
-  { value: 'man-hinh', label: 'Màn hình' },
-  { value: 'tay-cam', label: 'Tay cầm' },
-  { value: 'ban-phim', label: 'Bàn phím' },
-  { value: 'chuot', label: 'Chuột' },
-  { value: 'o-cung', label: 'Ổ cứng' },
-  { value: 'ram', label: 'RAM' },
+  { id: 1, value: 'Laptop' },
+  { id: 2, value: 'Bàn phím' },
+  { id: 3, value: 'Chuột' },
+  { id: 4, value: 'Tai nghe' },
+  { id: 5, value: 'Tay cầm chơi game' },
 ];
 
-export const manufacturers = [
-  { value: 'lenovo', label: 'Lenovo' },
-  { value: 'acer', label: 'Acer' },
-  { value: 'razer', label: 'Razer' },
-  { value: 'logitech', label: 'Logitech' },
-  { value: 'dell', label: 'Dell' },
-  { value: 'samsung', label: 'Samsung' },
-  { value: 'corsair', label: 'Corsair' },
+export const brands = [
+  { id: 1, value: 'Apple' },
+  { id: 2, value: 'Dell' },
+  { id: 3, value: 'HP' },
+  { id: 4, value: 'Lenovo' },
+  { id: 5, value: 'Asus' },
+  { id: 6, value: 'Corsair' },
+  { id: 7, value: 'Logitech' },
+  { id: 8, value: 'Razer' },
+  { id: 9, value: 'SteelSeries' },
+  { id: 10, value: 'HyperX' },
+  { id: 11, value: 'Sony' },
+  { id: 12, value: 'Beats' },
+  { id: 13, value: 'Sennheiser' },
+  { id: 14, value: 'JBL' },
+  { id: 15, value: 'Bose' },
+  { id: 16, value: 'Microsoft' },
+  { id: 17, value: 'Roccat' },
+  { id: 18, value: 'Mad Catz' },
+  { id: 19, value: 'Nintendo' },
+  { id: 20, value: 'Sony PlayStation' },
 ];

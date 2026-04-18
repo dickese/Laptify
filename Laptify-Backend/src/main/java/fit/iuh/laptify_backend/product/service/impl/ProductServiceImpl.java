@@ -21,10 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
+    private final TransactionTemplate transactionTemplate;
 
     @Override
     public PageResponse<List<ProductResponse>> getAllProducts(PageRequest page) {
@@ -94,24 +96,46 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductCreationRequest request) {
+        // Generate new productId
+        Long productId = System.currentTimeMillis();
+        List<String> skuCodes = generateSkuCodes(request.getSkus().size());
+
+        return transactionTemplate.execute(status -> saveProductWithSkus(
+                productId,
+                request,
+                skuCodes
+        ));
+    }
+
+    public ProductResponse saveProductWithSkus(
+            Long productId,
+            ProductCreationRequest request,
+            List<String> skuCodes
+    ) {
         Category category = getCategory(request.getCategoryId());
         Brand brand = getBrand(request.getBrandId());
 
-        Product product = buildProduct(request, category, brand);
+        Product product = buildProduct(request, productId, category, brand);
+        product.setId(productId);
 
-        List<ProductCreationRequest.SkuInfo> skuInfos = request.getSkus();
-
-        List<String> imageUrls = uploadSkuImages(skuInfos);
-
-        List<Sku> skus = buildSkus(skuInfos, imageUrls, product);
+        List<Sku> skus = buildSkus(
+                request.getSkus(),
+                skuCodes,
+                product
+        );
 
         skus.forEach(product::addSku);
 
-        productRepository.save(product);
-
-        return mapToResponse(product);
+        return mapToResponse(productRepository.save(product));
     }
 
+    private List<String> generateSkuCodes(int size) {
+        List<String> codes = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            codes.add(generateSkuCode());
+        }
+        return codes;
+    }
 
     private Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
@@ -128,10 +152,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private Product buildProduct(ProductCreationRequest request,
+                                 Long productId,
                                  Category category,
                                  Brand brand) {
 
         return new Product(
+                productId,
                 request.getName(),
                 request.getDescription(),
                 category,
@@ -139,22 +165,8 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
-    private List<String> uploadSkuImages(List<ProductCreationRequest.SkuInfo> skuInfos) {
-        List<MultipartFile> images = skuInfos.stream()
-                .map(ProductCreationRequest.SkuInfo::getImage)
-                .toList();
-
-//        List<String> imageUrls = uploadBatch(images);
-//
-//        if (imageUrls.size() != images.size()) {
-//            throw new IllegalArgumentException("Require image for all sku");
-//        }
-
-        return null;
-    }
-
     private List<Sku> buildSkus(List<ProductCreationRequest.SkuInfo> skuInfos,
-                                List<String> imageUrls,
+                                List<String> skuCodes,
                                 Product product) {
 
         List<Sku> skus = new ArrayList<>();
@@ -163,13 +175,11 @@ public class ProductServiceImpl implements ProductService {
             ProductCreationRequest.SkuInfo skuReq = skuInfos.get(i);
 
             Sku sku = new Sku(
-                    generateSkuCode(),
+                    skuCodes.get(i),
                     skuReq.getColor(),
                     skuReq.getPrice(),
                     skuReq.getStockQuantity(),
-                    0,
-                    // TODO: map imageUrls.get(i) to mediaMetadata
-                    null,
+                    skuReq.getImages(),
                     product
             );
 
@@ -180,7 +190,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private String generateSkuCode(){
-        return "";
+        return UUID.randomUUID().toString();
     }
 
     private org.springframework.data.domain.PageRequest toPageable(PageRequest pageRequest) {

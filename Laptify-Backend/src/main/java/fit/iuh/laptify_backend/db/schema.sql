@@ -18,8 +18,7 @@ create table categories
 
 create table products
 (
-    id          bigint auto_increment
-        primary key,
+    id          bigint primary key,
     created_at  datetime(6)  null,
     description text         null,
     name        varchar(255) not null,
@@ -106,7 +105,7 @@ create table user_placement_infos
 
 create table orders
 (
-    id                     varchar(255)                                                      not null
+    id                     bigint                                                      not null
         primary key,
     order_date             datetime(6)                                                       null,
     shipping_fee           decimal(38, 2)                                                    null,

@@ -32,13 +32,16 @@ public class Order {
     @Column(updatable = false)
     private BigDecimal shippingFee;
 
+    @Column(updatable = false)
+    private String trackingCode;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", orphanRemoval = true,cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_placement_info_id", nullable = false)
     private UserPlacementInfo userInfoPlacement;
 
