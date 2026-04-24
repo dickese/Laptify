@@ -81,9 +81,20 @@ const CheckoutPage = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Clear checkout and navigate
+      // Clear checkout and navigate with order data
       dispatch(clearCheckout());
-      navigate('/order-success');
+      navigate('/order-success', {
+        state: {
+          orderData: {
+            items: cartItems,
+            total: total,
+            subtotal: subtotal,
+            shipping: shipping,
+            customerInfo: formData,
+            orderNumber: '#' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+          },
+        },
+      });
     } catch (error) {
       console.error('Checkout error:', error);
       alert('Đặt hàng thất bại. Vui lòng thử lại.');
