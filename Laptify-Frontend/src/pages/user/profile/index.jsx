@@ -1,7 +1,3 @@
-import React from "react";
+import UserAccountPage from '@/pages/client/profile/UserAccountPage';
 
-const index = () => {
-  return <div></div>;
-};
-
-export default index;
+export default UserAccountPage;
