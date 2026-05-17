@@ -74,6 +74,14 @@ const UserMenuDropdown = ({ user }) => {
               <User className="size-4 transition-transform duration-200 group-hover:scale-110" />
               Hồ sơ
             </Link>
+            <Link
+              to="/order-history"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-all duration-200 hover:bg-accent hover:translate-x-1"
+              onClick={() => setIsOpen(false)}
+            >
+              <User className="size-4 transition-transform duration-200 group-hover:scale-110" />
+              Lịch sử mua hàng
+            </Link>
           </nav>
 
           {/* Logout Button */}

@@ -1,3 +1,3 @@
-import UserAccountPage from '@/pages/client/profile/UserAccountPage';
+import UserDetailPage from '@/pages/client/profile/UserDetailPage';
 
-export default UserAccountPage;
+export default UserDetailPage;
