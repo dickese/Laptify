@@ -12,6 +12,7 @@ import fit.iuh.laptify_backend.payment.entity.PaymentMethod;
 import fit.iuh.laptify_backend.payment.entity.PaymentStatus;
 import fit.iuh.laptify_backend.payment.registry.PaymentStrategyRegistry;
 import fit.iuh.laptify_backend.payment.repository.PaymentRepository;
+import fit.iuh.laptify_backend.payment.service.CallbackOutcome;
 import fit.iuh.laptify_backend.payment.service.PaymentService;
 import fit.iuh.laptify_backend.payment.strategy.PaymentStrategy;
 import fit.iuh.laptify_backend.payment.strategy.dto.PaymentCallbackResult;
@@ -76,36 +77,57 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public PaymentCallbackResult handleCallback(PaymentMethod method, Map<String, String> params) {
+    public CallbackOutcome processIpn(PaymentMethod method, Map<String, String> params) {
         PaymentStrategy strategy = strategyRegistry.resolve(method);
         PaymentCallbackResult result = strategy.parseCallback(params);
 
-        if (result.transactionRef() == null) {
-            log.warn("{} callback without a resolvable transaction ref", method);
-            return result;
+        if (!result.signatureValid()) {
+            log.warn("{} IPN rejected: invalid signature (ref={})", method, result.transactionRef());
+            return CallbackOutcome.INVALID_SIGNATURE;
         }
 
-        Payment payment = paymentRepository.findByTransactionRef(result.transactionRef())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Payment not found for ref: " + result.transactionRef()));
+        if (result.transactionRef() == null) {
+            log.warn("{} IPN without a resolvable transaction ref", method);
+            return CallbackOutcome.ORDER_NOT_FOUND;
+        }
 
-        // Idempotency: ignore repeated callbacks once a payment has reached a terminal state.
+        Payment payment = paymentRepository.findByTransactionRef(result.transactionRef()).orElse(null);
+        if (payment == null) {
+            log.warn("{} IPN for unknown payment ref={}", method, result.transactionRef());
+            return CallbackOutcome.ORDER_NOT_FOUND;
+        }
+
+        // Idempotency: a repeated IPN for an already-confirmed payment is a no-op.
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            log.info("Ignoring duplicate callback for already-successful payment {}", payment.getTransactionRef());
-            return result;
+            log.info("Duplicate IPN for already-successful payment {}", payment.getTransactionRef());
+            return CallbackOutcome.ALREADY_CONFIRMED;
+        }
+
+        // Guard against tampered/mismatched amounts (BigDecimal.compareTo ignores scale).
+        if (result.amount() != null && payment.getAmount().compareTo(result.amount()) != 0) {
+            log.warn("{} IPN amount mismatch for ref={}: expected={} got={}",
+                    method, result.transactionRef(), payment.getAmount(), result.amount());
+            return CallbackOutcome.AMOUNT_MISMATCH;
         }
 
         if (result.success()) {
             payment.setStatus(PaymentStatus.SUCCESS);
             payment.setGatewayTransactionId(result.gatewayTransactionId());
             payment.setPaidAt(Instant.now());
+            paymentRepository.save(payment);
             advanceOrderAfterPayment(payment.getOrderId());
-        } else {
-            payment.setStatus(PaymentStatus.FAILED);
+            return CallbackOutcome.CONFIRMED;
         }
-        paymentRepository.save(payment);
 
-        return result;
+        payment.setStatus(PaymentStatus.FAILED);
+        paymentRepository.save(payment);
+        return CallbackOutcome.PAYMENT_FAILED;
+    }
+
+    @Override
+    public PaymentCallbackResult verifyCallback(PaymentMethod method, Map<String, String> params) {
+        // Read-only: verify the signature and report the outcome; never mutates state.
+        return strategyRegistry.resolve(method).parseCallback(params);
     }
 
     private void advanceOrderAfterPayment(Long orderId) {
@@ -130,7 +152,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     /** Short, unique, gateway-safe reference (alphanumeric, no separators). */
     private String generateTransactionRef() {
-        return Long.toString(System.currentTimeMillis())
+        return System.currentTimeMillis()
                 + UUID.randomUUID().toString().replace("-", "").substring(0, 6);
     }
 }

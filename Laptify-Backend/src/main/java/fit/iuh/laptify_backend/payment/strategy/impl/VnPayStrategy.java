@@ -118,6 +118,7 @@ public class VnPayStrategy implements PaymentStrategy {
 
         return new PaymentCallbackResult(
                 params.get("vnp_TxnRef"),
+                signatureValid,
                 success,
                 params.get("vnp_TransactionNo"),
                 amount,

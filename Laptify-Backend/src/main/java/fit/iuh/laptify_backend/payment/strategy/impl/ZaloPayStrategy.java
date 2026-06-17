@@ -112,7 +112,7 @@ public class ZaloPayStrategy implements PaymentStrategy {
         boolean signatureValid = expectedMac.equals(receivedMac);
         if (!signatureValid) {
             log.warn("ZaloPay callback mac mismatch");
-            return new PaymentCallbackResult(null, false, null, null, "Invalid mac");
+            return new PaymentCallbackResult(null, false, false, null, null, "Invalid mac");
         }
 
         // ZaloPay only invokes the callback on a successful charge; mac validity == success.
@@ -122,13 +122,14 @@ public class ZaloPayStrategy implements PaymentStrategy {
             return new PaymentCallbackResult(
                     payload.path("app_trans_id").asText(),
                     true,
+                    true,
                     payload.path("zp_trans_id").asText(),
                     amount,
                     "ZaloPay payment success"
             );
         } catch (Exception e) {
             log.error("Failed to parse ZaloPay callback data", e);
-            return new PaymentCallbackResult(null, false, null, null, "Malformed callback data");
+            return new PaymentCallbackResult(null, true, false, null, null, "Malformed callback data");
         }
     }
 

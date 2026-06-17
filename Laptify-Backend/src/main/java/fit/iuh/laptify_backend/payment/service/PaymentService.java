@@ -13,8 +13,16 @@ public interface PaymentService {
     PaymentInitiationResponse initiatePayment(PaymentInitiationRequest request, String clientIp);
 
     /**
-     * Verify and apply a gateway callback/IPN. Idempotent: a callback for an already-confirmed
-     * payment is ignored. On success, the linked order is advanced out of PENDING.
+     * Verify and apply a gateway IPN (server-to-server notification — the source of truth).
+     * Idempotent: an IPN for an already-confirmed payment is a no-op. On success the linked
+     * order is advanced out of PENDING. Returns a granular {@link CallbackOutcome} so the caller
+     * can build the gateway-specific acknowledgement.
      */
-    PaymentCallbackResult handleCallback(PaymentMethod method, Map<String, String> params);
+    CallbackOutcome processIpn(PaymentMethod method, Map<String, String> params);
+
+    /**
+     * Verify a gateway callback WITHOUT mutating any state. Use for browser return URLs, whose
+     * only job is to show the customer a result — never to confirm the payment.
+     */
+    PaymentCallbackResult verifyCallback(PaymentMethod method, Map<String, String> params);
 }

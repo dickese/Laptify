@@ -123,6 +123,7 @@ public class MomoStrategy implements PaymentStrategy {
 
         return new PaymentCallbackResult(
                 params.get("orderId"),
+                signatureValid,
                 success,
                 params.get("transId"),
                 amount,
