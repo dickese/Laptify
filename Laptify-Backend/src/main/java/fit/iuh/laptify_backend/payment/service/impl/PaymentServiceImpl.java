@@ -50,6 +50,16 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessException("Đơn hàng đã được thanh toán");
         }
 
+        // Chỉ cho phép (thanh toán lần đầu hoặc retry) khi đơn đang chờ thanh toán.
+        // Đơn COD, đã đóng gói, hoặc đã hết hạn không được khởi tạo giao dịch online.
+        if (order.getStatus() == OrderStatus.EXPIRED) {
+            throw new BusinessException("Đơn hàng đã hết hạn thanh toán");
+        }
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT
+                && order.getStatus() != OrderStatus.PENDING) {
+            throw new BusinessException("Đơn hàng không ở trạng thái chờ thanh toán");
+        }
+
         BigDecimal amount = order.getTotalDue();
         if (amount == null || amount.signum() <= 0) {
             throw new BadRequestException("Invalid order amount");
@@ -132,10 +142,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void advanceOrderAfterPayment(Long orderId) {
         orderRepository.findById(orderId).ifPresent(order -> {
-            if (order.getStatus() == OrderStatus.PENDING) {
+            order.setPaid(true);
+            // Chỉ đẩy sang PACKAGING từ trạng thái chờ thanh toán; không ghi đè đơn đã xử lý.
+            if (order.getStatus() == OrderStatus.PENDING_PAYMENT
+                    || order.getStatus() == OrderStatus.PENDING) {
                 order.setStatus(OrderStatus.PACKAGING);
-                orderRepository.save(order);
             }
+            orderRepository.save(order);
         });
     }
 

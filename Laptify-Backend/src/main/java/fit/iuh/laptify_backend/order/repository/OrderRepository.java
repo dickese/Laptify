@@ -2,6 +2,7 @@ package fit.iuh.laptify_backend.order.repository;
 
 import fit.iuh.laptify_backend.order.dto.response.OrderDisplayResponse;
 import fit.iuh.laptify_backend.order.entity.Order;
+import fit.iuh.laptify_backend.order.entity.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,12 +11,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     Optional<Order> findByTrackingCode(String trackingCode);
+
+    /** Đơn ở trạng thái {@code status} được tạo trước mốc {@code cutoff} — dùng cho job hết hạn thanh toán. */
+    List<Order> findByStatusAndOrderDateBefore(OrderStatus status, Instant cutoff);
 
     @Query(value = "SELECT " +
             "o.id, " +

@@ -38,6 +38,14 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(updatable = false)
+    private OrderPaymentMethod paymentMethod;
+
+    /** Đã thanh toán hay chưa. COD luôn false đến khi giao hàng; online chuyển true khi cổng xác nhận. */
+    @Column(nullable = false)
+    private boolean paid;
+
     @OneToMany(mappedBy = "order", orphanRemoval = true,cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
 
@@ -49,10 +57,15 @@ public class Order {
         return totalPrice.add(shippingFee);
     }
 
-    public Order(Long id, UserPlacementInfo userInfoPlacement) {
+    public Order(Long id, UserPlacementInfo userInfoPlacement, OrderPaymentMethod paymentMethod) {
         this.id = id;
         this.orderDate = Instant.now();
-        this.status = OrderStatus.PENDING;
+        this.paymentMethod = paymentMethod;
+        // COD chờ xác nhận nội bộ; thanh toán online chờ khách hoàn tất trên cổng.
+        this.status = paymentMethod.isOnline()
+                ? OrderStatus.PENDING_PAYMENT
+                : OrderStatus.PENDING_CONFIRMATION;
+        this.paid = false;
         this.userInfoPlacement = userInfoPlacement;
     }
 }

@@ -16,6 +16,7 @@ import fit.iuh.laptify_backend.order.dto.response.OrderDisplayResponse;
 import fit.iuh.laptify_backend.order.dto.response.OrderResponse;
 import fit.iuh.laptify_backend.order.entity.Order;
 import fit.iuh.laptify_backend.order.entity.OrderDetail;
+import fit.iuh.laptify_backend.order.entity.OrderPaymentMethod;
 import fit.iuh.laptify_backend.order.entity.OrderStatus;
 import fit.iuh.laptify_backend.order.entity.UserPlacementInfo;
 import fit.iuh.laptify_backend.order.repository.OrderRepository;
@@ -165,8 +166,11 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(OrderCreationRequest request) {
         UserPlacementInfo customerInfo = buildCustomerPlacement(request.getCustomer());
 
+        OrderPaymentMethod paymentMethod = parsePaymentMethod(request.getPaymentMethod());
+
         Long newOrderId = System.currentTimeMillis();
-        Order order = new Order(newOrderId, customerInfo);
+        // COD -> PENDING_CONFIRMATION, online -> PENDING_PAYMENT (xem Order constructor).
+        Order order = new Order(newOrderId, customerInfo, paymentMethod);
 
         List<OrderDetail> orderDetails = buildOrderDetails(request.getProducts(), order);
 
@@ -202,14 +206,26 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderStatus validateOrderStatus(String status){
         log.info(status);
-        return switch (status) {
-            case "PENDING" -> OrderStatus.PENDING;
-            case "PACKAGING" -> OrderStatus.PACKAGING;
-            case "SHIPPING" -> OrderStatus.SHIPPING;
-            case "RECEIVED" -> OrderStatus.RECEIVED;
-            case "RETURNED" -> OrderStatus.RETURNED;
-            default -> null;
-        };
+        if (status == null) {
+            return null;
+        }
+        try {
+            return OrderStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    /** Phương thức thanh toán khách chọn; rỗng/null coi như COD để giữ tương thích ngược. */
+    private OrderPaymentMethod parsePaymentMethod(String method) {
+        if (method == null || method.isBlank()) {
+            return OrderPaymentMethod.COD;
+        }
+        try {
+            return OrderPaymentMethod.valueOf(method.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Unsupported payment method: " + method);
+        }
     }
 
     @Override
@@ -373,6 +389,8 @@ public class OrderServiceImpl implements OrderService {
                 order.getShippingFee(),
                 order.getTotalDue(),
                 order.getStatus().name(),
+                order.getPaymentMethod() == null ? null : order.getPaymentMethod().name(),
+                order.isPaid(),
                 order.getTrackingCode(),
                 customerInfo,
                 orderDetails

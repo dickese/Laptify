@@ -12,6 +12,8 @@ import java.util.List;
 public class OrderCreationRequest {
     private CustomerInfo customer;
     private List<ProductInfo> products;
+    /** Phương thức thanh toán: COD | VNPAY | MOMO | ZALOPAY. Mặc định COD nếu bỏ trống. */
+    private String paymentMethod;
 
     @Getter
     @NoArgsConstructor

@@ -18,6 +18,8 @@ public class OrderResponse {
     private BigDecimal shippingFee;
     private BigDecimal totalDue;
     private String status;
+    private String paymentMethod;
+    private boolean paid;
     private String trackingCode;
     private CustomerInfo customer;
     private List<OrderDetailInfo> orderDetails;
