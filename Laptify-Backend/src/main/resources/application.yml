@@ -31,3 +31,26 @@ cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME:your_cloud_name}
   api-key: ${CLOUDINARY_API_KEY:your_api_key}
   api-secret: ${CLOUDINARY_API_SECRET:your_api_secret}
+
+payment:
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE:your_tmn_code}
+    hash-secret: ${VNPAY_HASH_SECRET:your_hash_secret}
+    pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+    return-url: ${VNPAY_RETURN_URL:http://localhost:8080/api/v1/payments/vnpay/callback}
+    version: 2.1.0
+  momo:
+    partner-code: ${MOMO_PARTNER_CODE:your_partner_code}
+    access-key: ${MOMO_ACCESS_KEY:your_access_key}
+    secret-key: ${MOMO_SECRET_KEY:your_secret_key}
+    endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
+    redirect-url: ${MOMO_REDIRECT_URL:http://localhost:5173/payment-result}
+    ipn-url: ${MOMO_IPN_URL:http://localhost:8080/api/v1/payments/momo/callback}
+    request-type: ${MOMO_REQUEST_TYPE:captureWallet}
+  zalopay:
+    app-id: ${ZALOPAY_APP_ID:2553}
+    key1: ${ZALOPAY_KEY1:your_key1}
+    key2: ${ZALOPAY_KEY2:your_key2}
+    endpoint: ${ZALOPAY_ENDPOINT:https://sb-openapi.zalopay.vn/v2/create}
+    callback-url: ${ZALOPAY_CALLBACK_URL:http://localhost:8080/api/v1/payments/zalopay/callback}
+    redirect-url: ${ZALOPAY_REDIRECT_URL:http://localhost:5173/payment-result}
