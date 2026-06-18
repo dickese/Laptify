@@ -42,22 +42,35 @@ public class OrderExpirationScheduler {
     @Transactional
     public void expireStalePendingPayments() {
         Instant cutoff = Instant.now().minus(expirationMinutes, ChronoUnit.MINUTES);
-        List<Order> staleOrders =
+        List<Order> candidates =
                 orderRepository.findByStatusAndOrderDateBefore(OrderStatus.PENDING_PAYMENT, cutoff);
 
-        if (staleOrders.isEmpty()) {
+        if (candidates.isEmpty()) {
             return;
         }
 
-        for (Order order : staleOrders) {
+        int expired = 0;
+        for (Order candidate : candidates) {
+            // Khóa ghi rồi kiểm tra lại (cùng thứ tự khóa ORDER-trước như IPN, tránh deadlock):
+            // một IPN có thể vừa xác nhận đơn này (PENDING_PAYMENT -> PACKAGING) trong lúc chờ khóa;
+            // nếu vậy thì bỏ qua, không EXPIRE đơn đã thanh toán.
+            Order order = orderRepository.findByIdForUpdate(candidate.getId()).orElse(null);
+            if (order == null
+                    || order.getStatus() != OrderStatus.PENDING_PAYMENT
+                    || !order.getOrderDate().isBefore(cutoff)) {
+                continue;
+            }
             order.setStatus(OrderStatus.EXPIRED);
             restoreStock(order);
             cancelOpenPayments(order.getId());
+            orderRepository.save(order);
+            expired++;
         }
 
-        orderRepository.saveAll(staleOrders);
-        log.info("Expired {} PENDING_PAYMENT order(s) past the {}-minute window",
-                staleOrders.size(), expirationMinutes);
+        if (expired > 0) {
+            log.info("Expired {} PENDING_PAYMENT order(s) past the {}-minute window",
+                    expired, expirationMinutes);
+        }
     }
 
     /** Cộng lại số lượng tồn kho và lùi totalPurchases đã trừ khi tạo đơn. */

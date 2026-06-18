@@ -10,5 +10,6 @@ public enum CallbackOutcome {
     PAYMENT_FAILED,     // signature ok but the gateway reported a failed/declined charge
     INVALID_SIGNATURE,  // signature/checksum verification failed
     ORDER_NOT_FOUND,    // no payment matches the transaction ref
-    AMOUNT_MISMATCH     // amount reported by the gateway differs from the recorded amount
+    AMOUNT_MISMATCH,    // amount reported by the gateway differs from the recorded amount
+    REFUND_REQUIRED     // charge succeeded but after the order expired -> money taken, must be refunded
 }

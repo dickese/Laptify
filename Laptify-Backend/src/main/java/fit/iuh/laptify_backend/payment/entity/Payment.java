@@ -53,6 +53,13 @@ public class Payment {
 
     private Instant paidAt;
 
+    /**
+     * True khi cổng xác nhận thành công NHƯNG thời điểm thanh toán đã quá hạn đơn (đơn đã EXPIRED):
+     * tiền đã thu nhưng đơn không còn hiệu lực → cần hoàn tiền cho khách. Đánh dấu để ops/ job xử lý.
+     */
+    @Column(nullable = false)
+    private boolean refundRequired;
+
     public Payment(Long orderId, PaymentMethod method, BigDecimal amount, String transactionRef) {
         this.orderId = orderId;
         this.method = method;

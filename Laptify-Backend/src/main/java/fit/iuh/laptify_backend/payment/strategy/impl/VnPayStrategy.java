@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.Instant;
@@ -31,6 +32,8 @@ public class VnPayStrategy implements PaymentStrategy {
 
     private static final DateTimeFormatter VNP_DATE =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+    private static final DateTimeFormatter VNP_DATE_PARSE =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final PaymentProperties properties;
 
@@ -122,7 +125,23 @@ public class VnPayStrategy implements PaymentStrategy {
                 success,
                 params.get("vnp_TransactionNo"),
                 amount,
-                "VNPay response code: " + responseCode
+                "VNPay response code: " + responseCode,
+                parsePayDate(params.get("vnp_PayDate"))
         );
+    }
+
+    /** vnp_PayDate có dạng yyyyMMddHHmmss theo giờ Việt Nam; trả null nếu thiếu/không hợp lệ. */
+    private Instant parsePayDate(String payDate) {
+        if (payDate == null || payDate.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(payDate, VNP_DATE_PARSE)
+                    .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+                    .toInstant();
+        } catch (RuntimeException e) {
+            log.warn("Unparseable vnp_PayDate: {}", payDate);
+            return null;
+        }
     }
 }

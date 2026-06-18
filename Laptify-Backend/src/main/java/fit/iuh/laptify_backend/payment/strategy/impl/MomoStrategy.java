@@ -127,7 +127,21 @@ public class MomoStrategy implements PaymentStrategy {
                 success,
                 params.get("transId"),
                 amount,
-                params.get("message")
+                params.get("message"),
+                parseEpochMillis(params.get("responseTime"))
         );
+    }
+
+    /** MoMo gửi responseTime là epoch millis; trả null nếu thiếu/không hợp lệ. */
+    private java.time.Instant parseEpochMillis(String millis) {
+        if (millis == null || millis.isBlank()) {
+            return null;
+        }
+        try {
+            return java.time.Instant.ofEpochMilli(Long.parseLong(millis.trim()));
+        } catch (NumberFormatException e) {
+            log.warn("Unparseable MoMo responseTime: {}", millis);
+            return null;
+        }
     }
 }

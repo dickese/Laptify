@@ -3,8 +3,11 @@ package fit.iuh.laptify_backend.payment.service.impl;
 import fit.iuh.laptify_backend.advice.exception.BadRequestException;
 import fit.iuh.laptify_backend.advice.exception.BusinessException;
 import fit.iuh.laptify_backend.order.entity.Order;
+import fit.iuh.laptify_backend.order.entity.OrderDetail;
 import fit.iuh.laptify_backend.order.entity.OrderStatus;
 import fit.iuh.laptify_backend.order.repository.OrderRepository;
+import fit.iuh.laptify_backend.product.entity.Sku;
+import fit.iuh.laptify_backend.product.repository.SkuRepository;
 import fit.iuh.laptify_backend.payment.dto.request.PaymentInitiationRequest;
 import fit.iuh.laptify_backend.payment.dto.response.PaymentInitiationResponse;
 import fit.iuh.laptify_backend.payment.entity.Payment;
@@ -22,10 +25,12 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +42,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentStrategyRegistry strategyRegistry;
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final SkuRepository skuRepository;
+
+    /** Cửa sổ hết hạn đơn (phút) — phải khớp với job hết hạn để so sánh paidAt với hạn chót. */
+    @Value("${payment.order.expiration-minutes:15}")
+    private long expirationMinutes;
 
     @Override
     @Transactional
@@ -100,11 +110,18 @@ public class PaymentServiceImpl implements PaymentService {
             return CallbackOutcome.ORDER_NOT_FOUND;
         }
 
-        Payment payment = paymentRepository.findByTransactionRef(result.transactionRef()).orElse(null);
-        if (payment == null) {
+        // Unlocked lookup just to discover the order id; the real work uses ORDER-first pessimistic
+        // locks (order, then payment) — the same order as the expiration scheduler, so the two can
+        // never deadlock and can never both mutate the same order concurrently.
+        Payment lookup = paymentRepository.findByTransactionRef(result.transactionRef()).orElse(null);
+        if (lookup == null) {
             log.warn("{} IPN for unknown payment ref={}", method, result.transactionRef());
             return CallbackOutcome.ORDER_NOT_FOUND;
         }
+
+        Order order = orderRepository.findByIdForUpdate(lookup.getOrderId()).orElse(null);
+        Payment payment = paymentRepository.findByTransactionRefForUpdate(result.transactionRef())
+                .orElseThrow(() -> new EntityNotFoundException("Payment vanished: " + result.transactionRef()));
 
         // Idempotency: a repeated IPN for an already-confirmed payment is a no-op.
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
@@ -119,35 +136,102 @@ public class PaymentServiceImpl implements PaymentService {
             return CallbackOutcome.AMOUNT_MISMATCH;
         }
 
-        if (result.success()) {
-            payment.setStatus(PaymentStatus.SUCCESS);
-            payment.setGatewayTransactionId(result.gatewayTransactionId());
-            payment.setPaidAt(Instant.now());
+        if (!result.success()) {
+            payment.setStatus(PaymentStatus.FAILED);
             paymentRepository.save(payment);
-            advanceOrderAfterPayment(payment.getOrderId());
-            return CallbackOutcome.CONFIRMED;
+            return CallbackOutcome.PAYMENT_FAILED;
         }
 
-        payment.setStatus(PaymentStatus.FAILED);
+        // ----- Successful charge -----
+        Instant paidAt = result.paidAt() != null ? result.paidAt() : Instant.now();
+        payment.setGatewayTransactionId(result.gatewayTransactionId());
+        payment.setPaidAt(paidAt);
+        return applySuccessfulPayment(payment, order, paidAt);
+    }
+
+    /**
+     * Áp dụng một lần thanh toán thành công vào đơn, có xử lý "late success":
+     * tiền về sau khi job đã EXPIRE đơn. Dựa vào thời điểm thanh toán thực tế từ cổng (paidAt):
+     * - paidAt ≤ hạn chót: khách trả ĐÚNG HẠN, IPN chỉ tới trễ → tái kích hoạt đơn (nếu còn hàng).
+     * - paidAt > hạn chót: trả SAU HẠN → tiền đã thu nhưng đơn đã chết → đánh dấu cần hoàn tiền.
+     */
+    private CallbackOutcome applySuccessfulPayment(Payment payment, Order order, Instant paidAt) {
+        if (order == null) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setRefundRequired(true);
+            paymentRepository.save(payment);
+            log.error("Payment {} succeeded but order {} not found -> refund required",
+                    payment.getTransactionRef(), payment.getOrderId());
+            return CallbackOutcome.REFUND_REQUIRED;
+        }
+
+        if (order.getStatus() == OrderStatus.EXPIRED) {
+            Instant deadline = order.getOrderDate().plus(expirationMinutes, ChronoUnit.MINUTES);
+            boolean paidInTime = !paidAt.isAfter(deadline);
+
+            if (paidInTime && reReserveStock(order)) {
+                payment.setStatus(PaymentStatus.SUCCESS);
+                order.setPaid(true);
+                order.setStatus(OrderStatus.PACKAGING);
+                paymentRepository.save(payment);
+                orderRepository.save(order);
+                log.info("Late IPN within deadline -> reactivated expired order {} to PACKAGING", order.getId());
+                return CallbackOutcome.CONFIRMED;
+            }
+
+            // Trả sau hạn, hoặc trả đúng hạn nhưng kho đã hết khi tái kích hoạt → cần hoàn tiền.
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setRefundRequired(true);
+            paymentRepository.save(payment);
+            log.warn("Refund required for order {} (paidAt={}, deadline={}, paidInTime={})",
+                    order.getId(), paidAt, deadline, paidInTime);
+            return CallbackOutcome.REFUND_REQUIRED;
+        }
+
+        // Đường thường: đơn đang chờ thanh toán.
+        payment.setStatus(PaymentStatus.SUCCESS);
+        order.setPaid(true);
+        if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
+            order.setStatus(OrderStatus.PACKAGING);
+        }
         paymentRepository.save(payment);
-        return CallbackOutcome.PAYMENT_FAILED;
+        orderRepository.save(order);
+        return CallbackOutcome.CONFIRMED;
+    }
+
+    /**
+     * Trừ lại tồn kho cho đơn được tái kích hoạt (kho đã được hoàn lại lúc đơn hết hạn).
+     * Kiểm tra đủ hàng cho TẤT CẢ SKU trước khi trừ để không trừ một phần; trả false nếu thiếu hàng.
+     */
+    private boolean reReserveStock(Order order) {
+        if (order.getOrderDetails() == null) {
+            return true;
+        }
+        for (OrderDetail detail : order.getOrderDetails()) {
+            Sku sku = detail.getSku();
+            if (sku == null) {
+                return false;
+            }
+            int available = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
+            if (available < detail.getQuantity()) {
+                return false;
+            }
+        }
+        for (OrderDetail detail : order.getOrderDetails()) {
+            Sku sku = detail.getSku();
+            int available = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
+            sku.setStockQuantity(available - detail.getQuantity());
+            int purchases = sku.getTotalPurchases() == null ? 0 : sku.getTotalPurchases();
+            sku.setTotalPurchases(purchases + 1);
+            skuRepository.save(sku);
+        }
+        return true;
     }
 
     @Override
     public PaymentCallbackResult verifyCallback(PaymentMethod method, Map<String, String> params) {
         // Read-only: verify the signature and report the outcome; never mutates state.
         return strategyRegistry.resolve(method).parseCallback(params);
-    }
-
-    private void advanceOrderAfterPayment(Long orderId) {
-        orderRepository.findById(orderId).ifPresent(order -> {
-            order.setPaid(true);
-            // Chỉ đẩy sang PACKAGING từ trạng thái chờ thanh toán; không ghi đè đơn đã xử lý.
-            if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
-                order.setStatus(OrderStatus.PACKAGING);
-            }
-            orderRepository.save(order);
-        });
     }
 
     private PaymentMethod parseMethod(String method) {

@@ -112,24 +112,29 @@ public class ZaloPayStrategy implements PaymentStrategy {
         boolean signatureValid = expectedMac.equals(receivedMac);
         if (!signatureValid) {
             log.warn("ZaloPay callback mac mismatch");
-            return new PaymentCallbackResult(null, false, false, null, null, "Invalid mac");
+            return new PaymentCallbackResult(null, false, false, null, null, "Invalid mac", null);
         }
 
         // ZaloPay only invokes the callback on a successful charge; mac validity == success.
         try {
             JsonNode payload = objectMapper.readTree(data);
             BigDecimal amount = payload.has("amount") ? new BigDecimal(payload.get("amount").asText()) : null;
+            // server_time là epoch millis thời điểm ZaloPay xử lý giao dịch.
+            Instant paidAt = payload.has("server_time")
+                    ? Instant.ofEpochMilli(payload.get("server_time").asLong())
+                    : null;
             return new PaymentCallbackResult(
                     payload.path("app_trans_id").asText(),
                     true,
                     true,
                     payload.path("zp_trans_id").asText(),
                     amount,
-                    "ZaloPay payment success"
+                    "ZaloPay payment success",
+                    paidAt
             );
         } catch (Exception e) {
             log.error("Failed to parse ZaloPay callback data", e);
-            return new PaymentCallbackResult(null, true, false, null, null, "Malformed callback data");
+            return new PaymentCallbackResult(null, true, false, null, null, "Malformed callback data", null);
         }
     }
 

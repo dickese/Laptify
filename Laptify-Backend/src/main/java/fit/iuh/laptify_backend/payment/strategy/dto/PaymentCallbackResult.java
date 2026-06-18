@@ -1,6 +1,7 @@
 package fit.iuh.laptify_backend.payment.strategy.dto;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 /**
  * Normalized outcome parsed from a gateway callback/IPN. Strategies are responsible
@@ -14,6 +15,9 @@ import java.math.BigDecimal;
  * @param gatewayTransactionId  the gateway's own transaction id (for reconciliation)
  * @param amount                amount reported by the gateway, in VND (may be null)
  * @param message               raw status message from the gateway
+ * @param paidAt                gateway-reported time the charge actually happened; used to tell a
+ *                              merely-late IPN apart from a genuinely-late payment on an expired
+ *                              order. {@code null} if the gateway did not report a usable time.
  */
 public record PaymentCallbackResult(
         String transactionRef,
@@ -21,6 +25,7 @@ public record PaymentCallbackResult(
         boolean success,
         String gatewayTransactionId,
         BigDecimal amount,
-        String message
+        String message,
+        Instant paidAt
 ) {
 }

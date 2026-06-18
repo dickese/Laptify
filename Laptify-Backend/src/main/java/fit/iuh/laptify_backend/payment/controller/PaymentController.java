@@ -73,7 +73,10 @@ public class PaymentController {
     @PostMapping("/zalopay/callback")
     public ResponseEntity<Map<String, Object>> zalopayCallback(@RequestBody Map<String, Object> body) {
         CallbackOutcome outcome = paymentService.processIpn(PaymentMethod.ZALOPAY, stringify(body));
-        boolean acknowledged = outcome == CallbackOutcome.CONFIRMED || outcome == CallbackOutcome.ALREADY_CONFIRMED;
+        // REFUND_REQUIRED cũng coi là đã nhận (tiền đã về, sẽ hoàn nội bộ) -> báo ZaloPay ngừng retry.
+        boolean acknowledged = outcome == CallbackOutcome.CONFIRMED
+                || outcome == CallbackOutcome.ALREADY_CONFIRMED
+                || outcome == CallbackOutcome.REFUND_REQUIRED;
         return ResponseEntity.ok(Map.of(
                 "return_code", acknowledged ? 1 : -1,
                 "return_message", acknowledged ? "success" : "failed"
@@ -83,7 +86,8 @@ public class PaymentController {
     /** Map a generic outcome to VNPay's documented IPN response codes. */
     private Map<String, String> toVnpayAck(CallbackOutcome outcome) {
         return switch (outcome) {
-            case CONFIRMED, PAYMENT_FAILED -> ackOf("00", "Confirm Success");
+            // REFUND_REQUIRED: ta đã ghi nhận tiền (sẽ hoàn nội bộ) -> ack 00 để VNPay ngừng retry.
+            case CONFIRMED, PAYMENT_FAILED, REFUND_REQUIRED -> ackOf("00", "Confirm Success");
             case ALREADY_CONFIRMED -> ackOf("02", "Order already confirmed");
             case AMOUNT_MISMATCH -> ackOf("04", "Invalid amount");
             case INVALID_SIGNATURE -> ackOf("97", "Invalid Checksum");
