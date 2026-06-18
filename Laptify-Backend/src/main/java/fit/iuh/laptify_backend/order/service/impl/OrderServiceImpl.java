@@ -168,6 +168,7 @@ public class OrderServiceImpl implements OrderService {
 
         OrderPaymentMethod paymentMethod = parsePaymentMethod(request.getPaymentMethod());
 
+        log.info(paymentMethod.name());
         Long newOrderId = System.currentTimeMillis();
         // COD -> PENDING_CONFIRMATION, online -> PENDING_PAYMENT (xem Order constructor).
         Order order = new Order(newOrderId, customerInfo, paymentMethod);

@@ -55,8 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (order.getStatus() == OrderStatus.EXPIRED) {
             throw new BusinessException("Đơn hàng đã hết hạn thanh toán");
         }
-        if (order.getStatus() != OrderStatus.PENDING_PAYMENT
-                && order.getStatus() != OrderStatus.PENDING) {
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
             throw new BusinessException("Đơn hàng không ở trạng thái chờ thanh toán");
         }
 
@@ -144,8 +143,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderRepository.findById(orderId).ifPresent(order -> {
             order.setPaid(true);
             // Chỉ đẩy sang PACKAGING từ trạng thái chờ thanh toán; không ghi đè đơn đã xử lý.
-            if (order.getStatus() == OrderStatus.PENDING_PAYMENT
-                    || order.getStatus() == OrderStatus.PENDING) {
+            if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
                 order.setStatus(OrderStatus.PACKAGING);
             }
             orderRepository.save(order);

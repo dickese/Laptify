@@ -109,7 +109,7 @@ create table orders
         primary key,
     order_date             datetime(6)                                                       null,
     shipping_fee           decimal(38, 2)                                                    null,
-    status                 enum ('PACKAGING', 'PENDING', 'RECEIVED', 'RETURNED', 'SHIPPING') null,
+    status                 enum ('PACKAGING', 'PENDING_CONFIRMATION', 'RECEIVED', 'RETURNED', 'SHIPPING' ,'PENDING_PAYMENT', 'EXPIRED') null,
     total_price            decimal(38, 2)                                                    null,
     user_placement_info_id bigint                                                            not null,
     constraint FKp26qv8517f5vrug521uu1t720
@@ -122,7 +122,7 @@ create table order_details
         primary key,
     price_at_purchase decimal(38, 2) null,
     quantity          int            not null,
-    order_id          varchar(255)   null,
+    order_id          bigint   null,
     sku_code          varchar(100)   not null,
     constraint FKjyu2qbqt8gnvno9oe9j2s2ldk
         foreign key (order_id) references orders (id),

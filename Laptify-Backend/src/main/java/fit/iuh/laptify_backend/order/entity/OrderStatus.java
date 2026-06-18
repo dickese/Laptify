@@ -8,6 +8,5 @@ public enum OrderStatus {
     /** Đơn PENDING_PAYMENT quá hạn 15 phút mà chưa thanh toán thành công. */
     EXPIRED,
     /** Trạng thái cũ — giữ lại cho dữ liệu đã tồn tại trước khi tách COD/online. */
-    PENDING,
     PACKAGING, SHIPPING, RECEIVED, RETURNED;
 }
