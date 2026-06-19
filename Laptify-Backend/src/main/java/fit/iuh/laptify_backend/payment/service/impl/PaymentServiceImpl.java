@@ -3,11 +3,9 @@ package fit.iuh.laptify_backend.payment.service.impl;
 import fit.iuh.laptify_backend.advice.exception.BadRequestException;
 import fit.iuh.laptify_backend.advice.exception.BusinessException;
 import fit.iuh.laptify_backend.order.entity.Order;
-import fit.iuh.laptify_backend.order.entity.OrderDetail;
 import fit.iuh.laptify_backend.order.entity.OrderStatus;
 import fit.iuh.laptify_backend.order.repository.OrderRepository;
-import fit.iuh.laptify_backend.product.entity.Sku;
-import fit.iuh.laptify_backend.product.repository.SkuRepository;
+import fit.iuh.laptify_backend.product.service.InventoryService;
 import fit.iuh.laptify_backend.payment.dto.request.PaymentInitiationRequest;
 import fit.iuh.laptify_backend.payment.dto.response.PaymentInitiationResponse;
 import fit.iuh.laptify_backend.payment.entity.Payment;
@@ -42,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentStrategyRegistry strategyRegistry;
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
-    private final SkuRepository skuRepository;
+    private final InventoryService inventoryService;
 
     /** Cửa sổ hết hạn đơn (phút) — phải khớp với job hết hạn để so sánh paidAt với hạn chót. */
     @Value("${payment.order.expiration-minutes:15}")
@@ -200,32 +198,18 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
-     * Trừ lại tồn kho cho đơn được tái kích hoạt (kho đã được hoàn lại lúc đơn hết hạn).
-     * Kiểm tra đủ hàng cho TẤT CẢ SKU trước khi trừ để không trừ một phần; trả false nếu thiếu hàng.
+     * Trừ lại tồn kho nguyên tử cho đơn được tái kích hoạt (kho đã được hoàn lại lúc đơn hết hạn).
+     * Trả false nếu bất kỳ SKU nào đã bị người khác lấy mất hàng trong lúc đơn đang hết hạn.
      */
     private boolean reReserveStock(Order order) {
-        if (order.getOrderDetails() == null) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
             return true;
         }
-        for (OrderDetail detail : order.getOrderDetails()) {
-            Sku sku = detail.getSku();
-            if (sku == null) {
-                return false;
-            }
-            int available = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
-            if (available < detail.getQuantity()) {
-                return false;
-            }
-        }
-        for (OrderDetail detail : order.getOrderDetails()) {
-            Sku sku = detail.getSku();
-            int available = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
-            sku.setStockQuantity(available - detail.getQuantity());
-            int purchases = sku.getTotalPurchases() == null ? 0 : sku.getTotalPurchases();
-            sku.setTotalPurchases(purchases + 1);
-            skuRepository.save(sku);
-        }
-        return true;
+        return inventoryService.tryReserve(
+                order.getOrderDetails().stream()
+                        .map(detail -> new InventoryService.StockChange(detail.getSku().getSkuCode(), detail.getQuantity()))
+                        .toList()
+        ).isEmpty();
     }
 
     @Override

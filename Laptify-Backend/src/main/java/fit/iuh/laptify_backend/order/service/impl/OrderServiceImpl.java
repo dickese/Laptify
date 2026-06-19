@@ -27,6 +27,7 @@ import fit.iuh.laptify_backend.product.dto.common.PageRequest;
 import fit.iuh.laptify_backend.product.dto.common.PageResponse;
 import fit.iuh.laptify_backend.product.entity.Sku;
 import fit.iuh.laptify_backend.product.repository.SkuRepository;
+import fit.iuh.laptify_backend.product.service.InventoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final UserPlacementRepository userPlacementRepository;
     private final UserRepository userRepository;
+    private final InventoryService inventoryService;
 
     @Override
     public OrderResponse getOrderByTrackingCode(String trackingCode) {
@@ -168,20 +170,20 @@ public class OrderServiceImpl implements OrderService {
 
         OrderPaymentMethod paymentMethod = parsePaymentMethod(request.getPaymentMethod());
 
-        log.info(paymentMethod.name());
         Long newOrderId = System.currentTimeMillis();
         // COD -> PENDING_CONFIRMATION, online -> PENDING_PAYMENT (xem Order constructor).
         Order order = new Order(newOrderId, customerInfo, paymentMethod);
 
         List<OrderDetail> orderDetails = buildOrderDetails(request.getProducts(), order);
 
-        // Validate stock and update sku stockQuantity and totalPurchases
-        Set<Sku> skusToUpdate = collectSkusToUpdate(orderDetails);
-
-        // Persist sku updates
-        if (!skusToUpdate.isEmpty()) {
-            skuRepository.saveAll(skusToUpdate);
-        }
+        // Giữ kho NGAY tại bước tạo đơn (cả COD lẫn online) bằng trừ kho nguyên tử: chỉ một người
+        // thắng được tồn kho và đi tiếp vào quy trình thanh toán; người đến sau bị từ chối "hết hàng".
+        List<InventoryService.StockChange> reservations = orderDetails.stream()
+                .map(detail -> new InventoryService.StockChange(detail.getSku().getSkuCode(), detail.getQuantity()))
+                .toList();
+        inventoryService.tryReserve(reservations).ifPresent(soldOutSku -> {
+            throw new BadRequestException("Sản phẩm đã hết hàng: " + soldOutSku);
+        });
 
         BigDecimal totalPrice = calculateTotalPrice(orderDetails);
         order.setTotalPrice(totalPrice);
@@ -330,39 +332,6 @@ public class OrderServiceImpl implements OrderService {
         return orderDetails;
     }
 
-    /**
-     * Process order details: validate requested quantity, decrement stockQuantity and increment totalPurchases.
-     * Returns the set of SKUs that were changed and need to be persisted.
-     */
-    private Set<Sku> collectSkusToUpdate(List<OrderDetail> orderDetails) {
-        Set<Sku> skusToUpdate = new HashSet<>();
-
-        for (OrderDetail detail : orderDetails) {
-            Sku sku = detail.getSku();
-            if (sku == null) {
-                throw new EntityNotFoundException("Sku not found for order detail");
-            }
-
-            int requested = detail.getQuantity();
-            int available = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
-
-            if (requested <= 0) {
-                throw new BadRequestException("Invalid quantity for sku: " + sku.getSkuCode());
-            }
-
-            if (available < requested) {
-                throw new BadRequestException("Insufficient stock for sku: " + sku.getSkuCode());
-            }
-
-            sku.setStockQuantity(available - requested);
-            Integer totalPurchases = sku.getTotalPurchases() == null ? 0 : sku.getTotalPurchases();
-            sku.setTotalPurchases(totalPurchases + 1);
-
-            skusToUpdate.add(sku);
-        }
-
-        return skusToUpdate;
-    }
 
     private OrderResponse mapEntityToResponse(Order order){
         OrderResponse.CustomerInfo customerInfo = new OrderResponse.CustomerInfo(

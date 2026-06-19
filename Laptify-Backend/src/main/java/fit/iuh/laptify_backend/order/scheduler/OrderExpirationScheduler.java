@@ -1,14 +1,12 @@
 package fit.iuh.laptify_backend.order.scheduler;
 
 import fit.iuh.laptify_backend.order.entity.Order;
-import fit.iuh.laptify_backend.order.entity.OrderDetail;
 import fit.iuh.laptify_backend.order.entity.OrderStatus;
 import fit.iuh.laptify_backend.order.repository.OrderRepository;
 import fit.iuh.laptify_backend.payment.entity.Payment;
 import fit.iuh.laptify_backend.payment.entity.PaymentStatus;
 import fit.iuh.laptify_backend.payment.repository.PaymentRepository;
-import fit.iuh.laptify_backend.product.entity.Sku;
-import fit.iuh.laptify_backend.product.repository.SkuRepository;
+import fit.iuh.laptify_backend.product.service.InventoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,7 @@ public class OrderExpirationScheduler {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
-    private final SkuRepository skuRepository;
+    private final InventoryService inventoryService;
 
     @Value("${payment.order.expiration-minutes:15}")
     private long expirationMinutes;
@@ -73,24 +71,16 @@ public class OrderExpirationScheduler {
         }
     }
 
-    /** Cộng lại số lượng tồn kho và lùi totalPurchases đã trừ khi tạo đơn. */
+    /** Hoàn lại tồn kho (và lùi totalPurchases) đã trừ khi tạo đơn, cho đơn hết hạn. */
     private void restoreStock(Order order) {
-        if (order.getOrderDetails() == null) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
             return;
         }
-        for (OrderDetail detail : order.getOrderDetails()) {
-            Sku sku = detail.getSku();
-            if (sku == null) {
-                continue;
-            }
-            int stock = sku.getStockQuantity() == null ? 0 : sku.getStockQuantity();
-            sku.setStockQuantity(stock + detail.getQuantity());
-
-            int purchases = sku.getTotalPurchases() == null ? 0 : sku.getTotalPurchases();
-            sku.setTotalPurchases(Math.max(0, purchases - 1));
-
-            skuRepository.save(sku);
-        }
+        inventoryService.release(
+                order.getOrderDetails().stream()
+                        .map(detail -> new InventoryService.StockChange(detail.getSku().getSkuCode(), detail.getQuantity()))
+                        .toList()
+        );
     }
 
     /** Đóng các lần thử thanh toán còn PENDING của đơn đã hết hạn. */
